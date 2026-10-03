@@ -1,0 +1,26 @@
+---
+layout: default
+title: Harita
+permalink: /harita/
+harita: true
+---
+<section class="giris">
+    <h1>Harita</h1>
+    <p>Hikâyelerin geçtiği yerler. Bir noktaya dokun, hikâyeye git.</p>
+</section>
+
+<div id="harita" class="harita" role="region" aria-label="Hikâye haritası"></div>
+
+<noscript><p class="bos">Haritayı görmek için JavaScript gerekiyor.</p></noscript>
+
+<script>
+window.YOL_NOKTALAR = [
+{%- for post in site.posts -%}
+{%- if post.konum -%}
+  { "baslik": {{ post.title | jsonify }}, "yer": {{ post.yer | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "konum": {{ post.konum | jsonify }} },
+{%- endif -%}
+{%- endfor -%}
+];
+</script>
+<script src="{{ '/assets/leaflet/leaflet.js' | relative_url }}"></script>
+<script src="{{ '/assets/harita.js' | relative_url }}"></script>

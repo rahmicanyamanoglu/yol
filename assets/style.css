@@ -1,0 +1,161 @@
+/* Yol — bir yol defteri: krem kâğıt, koyu mürekkep, tek bir yol yeşili. */
+
+:root {
+    --kagit: #f6f1e7;
+    --kart: #fbf8f2;
+    --murekkep: #1d1a16;
+    --soluk: #6b6258;
+    --cizgi: #e2d9c9;
+    --vurgu: #2f5d50;
+    --vurgu-acik: #d9e6df;
+    --golge: 0 1px 2px rgba(29, 26, 22, .05), 0 8px 24px rgba(29, 26, 22, .06);
+    color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        --kagit: #171513;
+        --kart: #201d1a;
+        --murekkep: #ece6dc;
+        --soluk: #a39a8e;
+        --cizgi: #34302b;
+        --vurgu: #8fc1ae;
+        --vurgu-acik: #23332d;
+        --golge: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+    }
+}
+:root[data-theme="dark"] {
+    --kagit: #171513;
+    --kart: #201d1a;
+    --murekkep: #ece6dc;
+    --soluk: #a39a8e;
+    --cizgi: #34302b;
+    --vurgu: #8fc1ae;
+    --vurgu-acik: #23332d;
+    --golge: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .25);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    background: var(--kagit);
+    color: var(--murekkep);
+    font-family: 'Literata', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -webkit-text-size-adjust: 100%;
+}
+
+a { color: var(--vurgu); }
+img { max-width: 100%; height: auto; display: block; }
+
+.atla {
+    position: absolute; left: -9999px; top: 0;
+    background: var(--vurgu); color: var(--kagit); padding: .5rem 1rem;
+}
+.atla:focus { left: 1rem; top: 1rem; z-index: 10; }
+
+/* üst ve alt */
+.ust, .alt, main { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+
+.ust {
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: .5rem 1.5rem;
+    padding-top: 2rem; padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--cizgi);
+}
+.logo {
+    font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.6rem;
+    color: var(--murekkep); text-decoration: none; letter-spacing: -.01em;
+}
+.logo::after { content: ''; display: inline-block; width: .45em; height: .45em; margin-left: .2em; border-radius: 50%; background: var(--vurgu); }
+.ust nav { display: flex; gap: 1.25rem; font-size: .95rem; }
+.ust nav a { color: var(--soluk); text-decoration: none; }
+.ust nav a:hover, .ust nav a[aria-current] { color: var(--murekkep); }
+.ust nav a[aria-current] { text-decoration: underline; text-decoration-color: var(--vurgu); text-underline-offset: .35em; text-decoration-thickness: 2px; }
+
+.alt {
+    margin-top: 5rem; padding-top: 1.5rem; padding-bottom: 3rem;
+    border-top: 1px solid var(--cizgi);
+    color: var(--soluk); font-size: .85rem;
+}
+.alt a { color: var(--soluk); }
+
+/* giriş */
+.giris { padding: 3.5rem 0 2rem; }
+.giris h1, .yazi h1 {
+    font-family: 'Fraunces', serif; font-weight: 600;
+    font-size: clamp(2.2rem, 6vw, 3.2rem); line-height: 1.1; letter-spacing: -.02em;
+}
+.giris p { color: var(--soluk); margin-top: .75rem; max-width: 34em; }
+
+/* liste */
+.liste { display: grid; gap: 1.25rem; }
+.kart a {
+    display: grid; grid-template-columns: 1fr; gap: 1rem;
+    background: var(--kart); border: 1px solid var(--cizgi); border-radius: 10px;
+    padding: 1.25rem; color: inherit; text-decoration: none;
+    transition: box-shadow .2s, transform .2s;
+}
+.kart a:hover { box-shadow: var(--golge); transform: translateY(-2px); }
+.kart img { border-radius: 6px; aspect-ratio: 16 / 9; object-fit: cover; width: 100%; }
+.kart h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.45rem; line-height: 1.25; margin: .15rem 0 .4rem; }
+.kart p:last-child { color: var(--soluk); font-size: .95rem; }
+@media (min-width: 640px) {
+    .kart a:has(img) { grid-template-columns: 220px 1fr; align-items: center; }
+    .kart img { aspect-ratio: 4 / 3; }
+}
+
+.kunye { font-size: .85rem; color: var(--soluk); letter-spacing: .01em; }
+.yer { color: var(--vurgu); font-weight: 600; }
+.bos { color: var(--soluk); font-style: italic; padding: 2rem 0; }
+
+/* yazı */
+.yazi { padding-top: 3rem; }
+.yazi-bas { margin-bottom: 2rem; }
+.yazi-bas h1 { margin-top: .5rem; }
+.ozet { font-size: 1.15rem; color: var(--soluk); font-style: italic; margin-top: 1rem; }
+
+.kapak { margin: 0 -16px 2.5rem; }
+.kapak img { width: 100%; }
+.kapak figcaption, .metin figcaption { font-size: .85rem; color: var(--soluk); padding: .5rem 16px 0; }
+@media (min-width: 792px) { .kapak { margin: 0 0 2.5rem; } .kapak img { border-radius: 8px; } .kapak figcaption { padding-left: 0; } }
+
+.metin > * + * { margin-top: 1.25em; }
+.metin h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.5rem; line-height: 1.3; margin-top: 2.25em; }
+.metin h3 { font-size: 1.15rem; margin-top: 2em; }
+.metin > p:first-child::first-letter {
+    font-family: 'Fraunces', serif; float: left; font-size: 3.4em; line-height: .9;
+    padding: .08em .1em 0 0; color: var(--vurgu);
+}
+.metin blockquote {
+    border-left: 3px solid var(--vurgu); padding: .25rem 0 .25rem 1.25rem;
+    color: var(--soluk); font-style: italic;
+}
+.metin img { border-radius: 6px; }
+.metin figure { margin: 2em 0; }
+.metin hr { border: none; text-align: center; margin: 2.5em 0; }
+.metin hr::after { content: '· · ·'; color: var(--soluk); letter-spacing: .5em; }
+.metin ul, .metin ol { padding-left: 1.4em; }
+
+.komsu {
+    display: flex; justify-content: space-between; gap: 1rem;
+    margin-top: 4rem; padding-top: 1.5rem; border-top: 1px solid var(--cizgi);
+}
+.komsu a { text-decoration: none; color: var(--murekkep); font-family: 'Fraunces', serif; max-width: 48%; }
+.komsu a span { display: block; font-family: 'Literata', serif; font-size: .8rem; color: var(--soluk); }
+.komsu .sonraki { text-align: right; margin-left: auto; }
+
+/* harita */
+.harita {
+    height: min(70vh, 560px); border-radius: 10px; border: 1px solid var(--cizgi);
+    background: var(--kart); z-index: 0;
+}
+.isaret {
+    background: var(--vurgu); border: 3px solid var(--kagit); border-radius: 50%;
+    box-shadow: 0 0 0 1px var(--vurgu);
+}
+.leaflet-popup-content { font-family: 'Literata', serif; font-size: .95rem; }
+.leaflet-popup-content a { font-family: 'Fraunces', serif; font-weight: 600; display: block; }
+.leaflet-popup-content .yer { font-size: .8rem; }

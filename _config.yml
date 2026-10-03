@@ -1,0 +1,25 @@
+title: Yol
+description: Yol hikâyeleri, duraklar ve anılar.
+author: Rahmi Can Yamanoğlu
+lang: tr
+
+url: "https://rcyamanoglu.com"
+baseurl: "/yol"
+
+permalink: /:year/:title/
+markdown: kramdown
+kramdown:
+  input: GFM
+  smart_quotes: ["apos", "apos", "quot", "quot"]
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+feed:
+  path: feed.xml
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock

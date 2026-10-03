@@ -1,0 +1,27 @@
+---
+layout: default
+---
+<section class="giris">
+    <h1>Yol</h1>
+    <p>Yolda geçen günler, duraklar, insanlar. Akademinin dışında kalan hikâyeler.</p>
+</section>
+
+<section class="liste">
+    {% for post in site.posts %}
+    <article class="kart">
+        <a href="{{ post.url | relative_url }}">
+            {% if post.kapak %}<img src="{{ post.kapak | relative_url }}" alt="" loading="lazy">{% endif %}
+            <div>
+                <p class="kunye">
+                    {% if post.yer %}<span class="yer">{{ post.yer }}</span> · {% endif %}
+                    <time datetime="{{ post.date | date_to_xmlschema }}">{% include tarih.html d=post.date %}</time>
+                </p>
+                <h2>{{ post.title }}</h2>
+                <p>{{ post.ozet | default: post.excerpt | strip_html | truncatewords: 32 }}</p>
+            </div>
+        </a>
+    </article>
+    {% else %}
+    <p class="bos">İlk hikâye yakında.</p>
+    {% endfor %}
+</section>

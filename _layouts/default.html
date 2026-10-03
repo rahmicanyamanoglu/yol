@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#171513" media="(prefers-color-scheme: dark)">
+    {% seo %}
+    {% feed_meta %}
+    <link rel="icon" href="{{ '/assets/favicon.svg' | relative_url }}" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Literata:ital,opsz,wght@0,7..72,400;0,7..72,600;1,7..72,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}">
+    {% if page.harita %}
+    <link rel="stylesheet" href="{{ '/assets/leaflet/leaflet.css' | relative_url }}">
+    {% endif %}
+</head>
+<body>
+    <a class="atla" href="#icerik">İçeriğe geç</a>
+    <header class="ust">
+        <a class="logo" href="{{ '/' | relative_url }}">Yol</a>
+        <nav>
+            {% assign u = page.url %}
+            <a href="{{ '/' | relative_url }}"{% if u == '/' %} aria-current="page"{% endif %}>Hikâyeler</a>
+            <a href="{{ '/harita/' | relative_url }}"{% if u == '/harita/' %} aria-current="page"{% endif %}>Harita</a>
+            <a href="{{ '/hakkinda/' | relative_url }}"{% if u == '/hakkinda/' %} aria-current="page"{% endif %}>Hakkında</a>
+        </nav>
+    </header>
+
+    <main id="icerik">
+        {{ content }}
+    </main>
+
+    <footer class="alt">
+        <p>© {{ site.time | date: "%Y" }} {{ site.author }} · <a href="{{ '/feed.xml' | relative_url }}">RSS</a> · <a href="https://rcyamanoglu.com/">Akademik sayfa</a></p>
+    </footer>
+</body>
+</html>
