@@ -1,0 +1,5 @@
+<p class="kunye">
+    {%- if include.p.yer %}<span class="yer">{{ include.p.yer }}</span>{% endif -%}
+    {%- if include.p.donem %} · <span>{{ include.p.donem }}</span>
+    {%- else %} · <time datetime="{{ include.p.date | date_to_xmlschema }}">{% include tarih.html d=include.p.date %}</time>{% endif -%}
+</p>

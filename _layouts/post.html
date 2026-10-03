@@ -1,15 +1,20 @@
 ---
 layout: default
 ---
+{%- assign dolu = content | strip_html | strip | size -%}
 <article class="yazi">
     <header class="yazi-bas">
-        <p class="kunye">
-            {% if page.yer %}<span class="yer">{{ page.yer }}</span> · {% endif %}
-            <time datetime="{{ page.date | date_to_xmlschema }}">{% include tarih.html d=page.date %}</time>
-        </p>
+        {% include kunye.html p=page %}
         <h1>{{ page.title }}</h1>
         {% if page.ozet %}<p class="ozet">{{ page.ozet }}</p>{% endif %}
     </header>
+
+    {% if page.hayal or page.gercek %}
+    <aside class="ikilik" aria-label="Hayal ve gerçek">
+        <div><span>Hayal edilen</span><p>{{ page.hayal | default: "—" }}</p></div>
+        <div><span>Var olan</span><p>{{ page.gercek | default: "—" }}</p></div>
+    </aside>
+    {% endif %}
 
     {% if page.kapak %}
     <figure class="kapak">
@@ -19,7 +24,7 @@ layout: default
     {% endif %}
 
     <div class="metin">
-        {{ content }}
+        {% if dolu > 0 %}{{ content }}{% else %}<p class="bos">Bu hikâye henüz yazılmadı.</p>{% endif %}
     </div>
 
     <nav class="komsu">

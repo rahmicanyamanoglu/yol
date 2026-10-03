@@ -8,16 +8,18 @@ layout: default
 
 <section class="liste">
     {% for post in site.posts %}
-    <article class="kart">
+    {%- assign dolu = post.content | strip_html | strip | size -%}
+    <article class="kart{% if dolu == 0 %} yazilmadi{% endif %}">
         <a href="{{ post.url | relative_url }}">
             {% if post.kapak %}<img src="{{ post.kapak | relative_url }}" alt="" loading="lazy">{% endif %}
             <div>
-                <p class="kunye">
-                    {% if post.yer %}<span class="yer">{{ post.yer }}</span> · {% endif %}
-                    <time datetime="{{ post.date | date_to_xmlschema }}">{% include tarih.html d=post.date %}</time>
-                </p>
+                {% include kunye.html p=post %}
                 <h2>{{ post.title }}</h2>
+                {% if dolu > 0 %}
                 <p>{{ post.ozet | default: post.excerpt | strip_html | truncatewords: 32 }}</p>
+                {% else %}
+                <p>Henüz yazılmadı.</p>
+                {% endif %}
             </div>
         </a>
     </article>

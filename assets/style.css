@@ -125,7 +125,7 @@ img { max-width: 100%; height: auto; display: block; }
 .metin > * + * { margin-top: 1.25em; }
 .metin h2 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 1.5rem; line-height: 1.3; margin-top: 2.25em; }
 .metin h3 { font-size: 1.15rem; margin-top: 2em; }
-.metin > p:first-child::first-letter {
+.metin > p:first-child:not(.bos)::first-letter {
     font-family: 'Fraunces', serif; float: left; font-size: 3.4em; line-height: .9;
     padding: .08em .1em 0 0; color: var(--vurgu);
 }
@@ -147,15 +147,69 @@ img { max-width: 100%; height: auto; display: block; }
 .komsu a span { display: block; font-family: 'Literata', serif; font-size: .8rem; color: var(--soluk); }
 .komsu .sonraki { text-align: right; margin-left: auto; }
 
+/* yazılmamış hikâyeler */
+.kart.yazilmadi a { background: transparent; border-style: dashed; }
+.kart.yazilmadi h2 { color: var(--soluk); }
+.kart.yazilmadi p:last-child { font-style: italic; }
+
+/* hayal / gerçek ikiliği */
+.ikilik {
+    display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 2.5rem;
+    border: 1px solid var(--cizgi); border-radius: 10px; overflow: hidden;
+}
+.ikilik div { padding: 1rem 1.25rem; }
+.ikilik div:first-child { border-right: 1px dashed var(--cizgi); font-style: italic; color: var(--soluk); }
+.ikilik span { display: block; font-size: .75rem; letter-spacing: .06em; color: var(--vurgu); font-style: normal; font-weight: 600; margin-bottom: .25rem; }
+
 /* harita */
+.harita-kontrol {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: .75rem 1.5rem; margin-bottom: 1rem;
+}
+.kaydirici { display: flex; align-items: center; gap: .75rem; font-size: .9rem; color: var(--soluk); flex: 1 1 260px; }
+.kaydirici span:first-child { font-style: italic; }
+.kaydirici input { flex: 1; accent-color: var(--vurgu); }
+.kaydirici input:disabled { opacity: .4; }
+.dugme {
+    font: inherit; font-size: .9rem; cursor: pointer;
+    background: transparent; color: var(--vurgu);
+    border: 1px solid var(--vurgu); border-radius: 999px; padding: .4rem 1.1rem;
+}
+.dugme:hover { background: var(--vurgu-acik); }
+.dugme:disabled { opacity: .4; cursor: default; background: transparent; }
+.dugme.dolu { background: var(--vurgu); color: var(--kagit); }
+.dugme.dolu:hover { opacity: .9; }
+
 .harita {
+    --hayal: 0;
     height: min(70vh, 560px); border-radius: 10px; border: 1px solid var(--cizgi);
     background: var(--kart); z-index: 0;
 }
+.harita .izgara { stroke: var(--soluk); stroke-width: 1; stroke-dasharray: 2 6; stroke-opacity: calc(var(--hayal) * .5); }
+.harita .fark { stroke: var(--vurgu); stroke-width: 1.5; stroke-dasharray: 4 5; stroke-opacity: .8; fill: none; }
+.harita.hayalde { background: var(--kagit); }
+
 .isaret {
     background: var(--vurgu); border: 3px solid var(--kagit); border-radius: 50%;
     box-shadow: 0 0 0 1px var(--vurgu);
 }
+.isaret.hayalsiz { background: transparent; border: 2px dashed var(--vurgu); box-shadow: none; }
+.denemede .isaret { cursor: grab; }
+
+.deneme {
+    margin-top: 1rem; padding: 1rem 1.25rem;
+    border: 1px dashed var(--vurgu); border-radius: 10px; background: var(--vurgu-acik);
+}
+.deneme p { font-size: .95rem; }
+.deneme-dugmeler { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .75rem; }
+
+.leaflet-tooltip.etiket {
+    font-family: 'Literata', serif; font-size: .75rem; padding: 1px 6px;
+    background: var(--kart); color: var(--murekkep); border: 1px solid var(--cizgi); box-shadow: none;
+}
+.leaflet-tooltip.etiket::before { display: none; }
 .leaflet-popup-content { font-family: 'Literata', serif; font-size: .95rem; }
 .leaflet-popup-content a { font-family: 'Fraunces', serif; font-weight: 600; display: block; }
-.leaflet-popup-content .yer { font-size: .8rem; }
+.leaflet-popup-content .yer { font-size: .75rem; letter-spacing: .04em; }
+.leaflet-popup-content p { margin: .25rem 0 0; }
+.leaflet-popup-content p.soluk { color: #8a8076; font-style: italic; }
