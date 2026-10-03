@@ -5,9 +5,10 @@ yer: "Şehir, Ülke"
 konum: [41.01, 28.98]        # enlem, boylam — Google Maps'te yere sağ tıkla, ilk satırdaki sayılar
 ozet: "Listede görünecek bir-iki cümlelik özet."
 donem: "Mayıs 2024"           # isteğe bağlı; yazılırsa tarih yerine bu görünür
-hayal: "Gitmeden önce nasıl hayal etmiştim, tek cümle"
+hayal: "Gitmeden önce nasıl hayal etmiştim; Kentler sayfasında Marco Polo bunu anlatır"
 gercek: "Vardığımda ne buldum, tek cümle"
-hayal_konum: [44.0, 30.0]     # gitmeden önce zihnimde nerede duruyordu; haritanın hayal katmanı
+kent: ayna                    # görünmez kentin biçimi: ince | ip | asili | ayna | hali (yazmazsan addan türetilir)
+hayal_adi: "Valdrada"         # isteğe bağlı; Calvino'daki gibi kente hayali bir ad
 kapak: /assets/img/ornek.jpg  # isteğe bağlı; fotoğrafı assets/img klasörüne koy
 kapak_aciklama: "Fotoğrafın altına yazılacak not"
 ---

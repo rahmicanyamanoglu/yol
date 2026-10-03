@@ -12,26 +12,19 @@ Site GitHub Pages üzerinde Jekyll ile kendiliğinden oluşur; `main` dalına gi
 
 `_drafts/` içindeki yazılar yayında görünmez. `_posts/` içinde metni boş olan bir yazı listede "Henüz yazılmadı" olarak görünür; boş yerleri böyle tutabilirsin.
 
-## Harita: hayal edilen, var olan
+## Görünmez Kentler
 
-Haritada her yerin iki konumu var: gerçek konum (`konum`) ve zihindeki konum (`hayal_konum`). Kaydırıcı ikisi arasında gidip gelir, aradaki kesikli çizgi farkı gösterir. `hayal_konum` yazılmamış yerler hayal katmanında boş halka olarak görünür.
+`/kentler/` sayfası, Calvino'nun *Görünmez Kentler*'inden esinle her yeri hayali bir mimariye çevirir. Çizim, yerin adından türetilen bir tohumla üretilir; yani her kent her açılışta aynı görünür. Beş biçim var:
 
-**Sen de dene:** Ziyaretçi haritaya bakmadan yerleri hafızasından yerleştirir, sonra gerçeği görür. Kendi hayal konumlarını üretmek için de bunu kullanabilirsin: yerleştir, "Göster"e bas, "Konumları kopyala" ile çıkan satırları ilgili yazılara yapıştır.
-
-### Üst bilgi alanları
-
-| Alan | Ne işe yarar | Zorunlu mu |
+| `kent` | Biçim | Esin |
 |---|---|---|
-| `title` | Başlık | evet |
-| `yer` | "Lund, İsveç" gibi | hayır |
-| `konum` | `[enlem, boylam]`; haritada nokta olur | hayır |
-| `ozet` | Listede görünen kısa metin | hayır |
-| `donem` | "2021 – 2023" gibi; tarih yerine görünür | hayır |
-| `hayal` | Gitmeden önce nasıl hayal ettiğin, tek cümle | hayır |
-| `gercek` | Vardığında ne bulduğun, tek cümle | hayır |
-| `hayal_konum` | `[enlem, boylam]`; zihnindeki konum, haritanın hayal katmanı | hayır |
-| `kapak` | Kapak fotoğrafı yolu | hayır |
-| `kapak_aciklama` | Fotoğraf altı yazısı | hayır |
+| `ince` | Direkler, platformlar, merdivenler üstünde bir kent | Zenobia |
+| `ip` | Direkler arasında renkli iplerle örülü bir kent | Ersilia |
+| `asili` | İki uçurum arasında gerilmiş bir ağa asılı kent | Octavia |
+| `ayna` | Suda yansıyan bir kent | Valdrada |
+| `hali` | Kentin gerçek biçimini taşıyan labirent bir halı | Eudoxia |
+
+`kent` yazılmazsa biçim addan türetilir. Bir kente tıklayınca içeri girilir: çizim kendini çizer, imleçle derinlik kazanır, dokunulan yere kentin biçimine uygun yeni bir parça eklenir (ziyaretçinin tarayıcısında saklanır). "Görünen" düğmesi aynı yeri gerçek haritada gösterir; `hayal` cümlesi "Marco Polo anlatır" başlığıyla yanında durur.
 
 ## Yerelde denemek
 

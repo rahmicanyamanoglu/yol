@@ -1,0 +1,56 @@
+---
+layout: default
+title: Görünmez Kentler
+permalink: /kentler/
+harita: true
+---
+<section class="giris">
+    <h1>Görünmez Kentler</h1>
+    <p>Calvino'da Marco Polo, Kubilay Han'a gezdiği kentleri anlatır; ama anlattığı her kent biraz da hayal ettiği kenttir. Burada da gittiğim her yer, zihnimde başka bir mimariye dönüştü. Bir kente dokun, içine gir, ona bir şey ekle; sonra haritadaki halini gör.</p>
+</section>
+
+<div class="kentler" id="kentler"></div>
+
+<dialog id="kent" class="kent-pencere" aria-labelledby="kent-ad">
+    <div class="kent-ust">
+        <div>
+            <p class="kent-tur" id="kent-tur"></p>
+            <h2 id="kent-ad"></h2>
+            <p class="kent-yer" id="kent-yer"></p>
+        </div>
+        <button type="button" class="kapat" id="kapat" aria-label="Kapat">×</button>
+    </div>
+    <div class="kent-govde">
+        <div class="kent-sahne">
+            <svg id="kent-svg" viewBox="0 0 600 600" role="img" aria-label="Hayali kent çizimi"></svg>
+            <div id="kent-harita" class="kent-harita" hidden></div>
+        </div>
+        <div class="kent-yan">
+            <div class="gecis" role="group" aria-label="Görünüm">
+                <button type="button" data-mod="gorunmez" aria-pressed="true">Görünmez</button>
+                <button type="button" data-mod="gorunen" aria-pressed="false">Görünen</button>
+            </div>
+            <p class="anlati"><span>Marco Polo anlatır</span><span id="kent-anlati"></span></p>
+            <p class="ipucu" id="kent-ipucu">Kente dokun: ona bir şey ekle. Eklediklerin bu tarayıcıda kalır.</p>
+            <p class="kent-eylem">
+                <button type="button" class="dugme" id="kent-sil">Eklediklerimi sil</button>
+                <a class="dugme dolu" id="kent-link" href="#">Hikâyeye git →</a>
+            </p>
+        </div>
+    </div>
+</dialog>
+
+<noscript><p class="bos">Kentleri görmek için JavaScript gerekiyor.</p></noscript>
+
+<script>
+window.YOL_KENTLER = [
+{%- for post in site.posts reversed -%}
+{%- if post.konum -%}
+{%- assign dolu = post.content | strip_html | strip | size -%}
+  { "baslik": {{ post.title | jsonify }}, "slug": {{ post.slug | jsonify }}, "yer": {{ post.yer | jsonify }}, "donem": {{ post.donem | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "konum": {{ post.konum | jsonify }}, "kent": {{ post.kent | jsonify }}, "hayal_adi": {{ post.hayal_adi | jsonify }}, "hayal": {{ post.hayal | jsonify }}, "dolu": {% if dolu > 0 %}true{% else %}false{% endif %} },
+{%- endif -%}
+{%- endfor -%}
+];
+</script>
+<script src="{{ '/assets/leaflet/leaflet.js' | relative_url }}"></script>
+<script src="{{ '/assets/kentler.js' | relative_url }}"></script>
