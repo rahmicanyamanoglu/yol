@@ -735,6 +735,7 @@
             dil: simdiki.dil,
             lehce: simdiki.lehce,
             kayitlar: simdiki.kayitlar,
+            taban: window.YOL_TABAN,
             bicim: icSahne.bicim,
             hava: icSahne.hava,
             A: icSahne.A,

@@ -27,6 +27,7 @@ SES = KOK / "assets" / "ses"
 KAYNAK = KOK / "_data" / "ses_kaynaklari.json"
 AJAN = "Mozilla/5.0 (compatible; rcyamanoglu.com/yol CC0 sound search)"  # başlıklar yalnız ASCII olabilir
 CC0 = "creativecommons.org/publicdomain/zero"
+SORGU_BASI = 8  # her sorgudan en fazla kaç ses incelenir
 
 
 def getir(url, ikili=False):
@@ -77,9 +78,11 @@ def ara(sorgular):
             continue
         bulunan = re.findall(r'/people/([^/"]+)/sounds/(\d+)/', sayfa)
         print(f"[ara] {sorgu}: {len(set(bulunan))} sonuç", file=sys.stderr)
+        bu_sorgu = 0
         for kisi, kimlik in bulunan:
-            if kimlik in gorulen or len(gorulen) >= 60:
+            if kimlik in gorulen or bu_sorgu >= SORGU_BASI:
                 continue
+            bu_sorgu += 1
             gorulen.add(kimlik)
             try:
                 bilgi = ses_bilgisi(kisi, kimlik)
@@ -89,7 +92,7 @@ def ara(sorgular):
             bilgi["sorgu"] = sorgu
             if bilgi["cc0"]:
                 sonuc.append(bilgi)
-            time.sleep(0.5)
+            time.sleep(0.3)
     print("ADAYLAR_JSON_BASLA")
     print(json.dumps(sonuc, ensure_ascii=False, indent=1))
     print("ADAYLAR_JSON_BITIR")

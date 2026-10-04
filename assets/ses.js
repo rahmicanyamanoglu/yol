@@ -309,30 +309,70 @@
     }
     if (konusma && konusma.getVoices) konusma.getVoices(); // sesleri önceden yükle
 
-    // Gerçek kayıtlar (yazıdaki "kayitlar" listesi) varsa konuşma motoru yerine onlar çalar
-    var kayitlar = [];
-    function kayitlariYukle(liste) {
-        kayitlar = [];
-        (liste || []).forEach(function (url) {
-            fetch(url).then(function (y) { return y.arrayBuffer(); })
-                .then(function (v) { return new Promise(function (ok, red) { ctx.decodeAudioData(v, ok, red); }); })
-                .then(function (tampon) { kayitlar.push(tampon); })
-                .catch(function () { /* bozuk ya da eksik dosya: atla */ });
+    /* Gerçek kayıtlar: yazıdaki "kayitlar" alanı, ses türüne göre dosya listesi
+       (ör. inşaat: [...], bağırış: [...]). Bir türün kaydı varsa o tür için
+       sentez ya da konuşma motoru yerine kayıt çalar. */
+    var kayitlar = {}, yukleme = 0;
+    function kayitlariYukle(harita, taban, hazir) {
+        kayitlar = {};
+        var oturum = ++yukleme;
+        Object.keys(harita || {}).forEach(function (tur) {
+            kayitlar[tur] = [];
+            (harita[tur] || []).forEach(function (yol) {
+                var url = /^(https?:)?\//.test(yol) ? yol : (taban || '/') + yol;
+                fetch(url).then(function (y) { if (!y.ok) throw new Error(y.status); return y.arrayBuffer(); })
+                    .then(function (v) { return new Promise(function (ok, red) { ctx.decodeAudioData(v, ok, red); }); })
+                    .then(function (tampon) {
+                        if (oturum !== yukleme) return; // bu arada başka kente geçildi
+                        kayitlar[tur].push(tampon);
+                        if (hazir && kayitlar[tur].length === 1) hazir(tur);
+                    })
+                    .catch(function () { /* bozuk ya da eksik dosya: atla */ });
+            });
         });
     }
-    function kayitCal() {
-        if (!kayitlar.length) return false;
-        var s = ctx.createBufferSource(), g = kazanc(rnd(0.45, 0.8)), p = pan(rnd(-0.7, 0.7));
-        s.buffer = kayitlar[Math.floor(Math.random() * kayitlar.length)];
-        s.playbackRate.value = rnd(0.94, 1.06);
+    function kaydiVar(tur) { return !!(ayar && ayar.kayitlar && ayar.kayitlar[tur] && ayar.kayitlar[tur].length); }
+
+    // Kayıttan rastgele bir kesit: yumuşak giriş ve çıkışla
+    function kesitCal(tur, enAz, enCok, ses) {
+        var liste = kayitlar[tur];
+        if (!liste || !liste.length) return false;
+        var tampon = liste[Math.floor(Math.random() * liste.length)];
+        var sure = Math.min(tampon.duration, rnd(enAz, enCok)), bas = Math.random() * Math.max(0, tampon.duration - sure);
+        var s = ctx.createBufferSource(), g = kazanc(0), p = pan(rnd(-0.6, 0.6)), t = ctx.currentTime;
+        s.buffer = tampon;
         bagla(s, g, p, ana);
-        s.start();
-        birak(p, s.buffer.duration + 1);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(ses, t + 0.4);
+        g.gain.setValueAtTime(ses, t + sure - 0.6);
+        g.gain.linearRampToValueAtTime(0, t + sure);
+        s.start(t, bas, sure);
+        birak(p, sure + 0.5);
         return true;
     }
 
+    // Kayıtlardan kesintisiz bir yatak: biri biterken öteki yumuşakça girer
+    function yatak(tur, ses) {
+        if (!aktif || !kayitlar[tur] || !kayitlar[tur].length) return;
+        var tampon = kayitlar[tur][Math.floor(Math.random() * kayitlar[tur].length)];
+        var s = ctx.createBufferSource(), g = kazanc(0), p = pan(rnd(-0.3, 0.3)), t = ctx.currentTime, gecis = 2;
+        s.buffer = tampon;
+        bagla(s, g, p, ana);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(ses, t + gecis);
+        g.gain.setValueAtTime(ses, t + Math.max(gecis, tampon.duration - gecis));
+        g.gain.linearRampToValueAtTime(0, t + tampon.duration);
+        s.start(t);
+        kaynaklar.push(s);
+        var id = setTimeout(function () {
+            zamanlayicilar.splice(zamanlayicilar.indexOf(id), 1);
+            yatak(tur, ses);
+        }, Math.max(1, tampon.duration - gecis) * 1000);
+        zamanlayicilar.push(id);
+    }
+
     OLAY['bağırış'] = function () {
-        if (kayitCal()) return;
+        if (kaydiVar('bağırış')) { kesitCal('bağırış', 3, 7, 0.75); return; }
         var dil = (ayar && ayar.dil) || 'it-IT', kok = dil.split('-')[0];
         var liste = BAGIRIS[(ayar && ayar.lehce) || kok] || BAGIRIS[kok], secim = dilSesi(dil);
         if (!liste || !secim || konusma.speaking) return;
@@ -373,7 +413,22 @@
         ana.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 1.5);
 
         var sesler = (ayar.sesler || '').split(/[\s,]+/).filter(Boolean);
-        kayitlariYukle(ayar.kayitlar);
+        // Kayıt türleri: "ortam" ve "inşaat" kesintisiz yatak olur, "bağırış" kısa
+        // kesitlerle gelir, geri kalan her tür (metro, martı, kalabalık...) ara ara
+        // birkaç saniyelik kesitlerle çalar. Kentin gerçek kaydı varsa sentezlenmiş
+        // kent sesleri susar; hava sesleri (rüzgâr, yağmur, gök gürültüsü) kalır.
+        var YATAK = { 'ortam': 0.5, 'inşaat': 0.55 };
+        var turler = Object.keys(ayar.kayitlar || {}).filter(kaydiVar);
+        var gercekKent = turler.some(function (t) { return t !== 'bağırış'; });
+        kayitlariYukle(ayar.kayitlar, ayar.taban, function (tur) {
+            if (!aktif) return;
+            if (YATAK[tur]) yatak(tur, YATAK[tur] * sus);
+        });
+        turler.forEach(function (tur) {
+            if (YATAK[tur] || tur === 'bağırış') return;
+            tekrarla(function () { kesitCal(tur, 4, 9, 0.6 * sus); }, 6, 16);
+        });
+        if (gercekKent) sesler = sesler.filter(function (t) { return t === 'bağırış'; });
         var h = ayar.hava || {}, A = ayar.A || 0.5;
         var sus = h.kar ? 0.5 : 1; // kar sesi bastırır
 
@@ -387,8 +442,8 @@
         if (sesler.indexOf('bisiklet') > -1) tekrarla(OLAY['bisiklet'], 7, 18);
         if (sesler.indexOf('kilise') > -1) tekrarla(OLAY['kilise'], 20, 45);
         if (sesler.indexOf('tramvay') > -1) tekrarla(OLAY['tramvay'], 12, 28);
-        if (sesler.indexOf('inşaat') > -1) {
-            // arkada sürekli çalışan bir dizel motoru
+        if (sesler.indexOf('inşaat') > -1 && !kaydiVar('inşaat')) {
+            // kayıt yoksa: arkada sürekli çalışan bir dizel motoru
             var motor = ctx.createOscillator(), mlp = filtre('lowpass', 160), mg = kazanc(0);
             motor.type = 'sawtooth'; motor.frequency.value = 46;
             bagla(motor, mlp, mg, ana);
