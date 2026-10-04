@@ -1,0 +1,45 @@
+name: Freesound sesleri
+
+# Elle çalıştırılır. "ara": CC0 adayları listeler (iş günlüğünde).
+# "indir": verilen ses numaralarını assets/ses/ altına indirip kaydeder.
+on:
+  workflow_dispatch:
+    inputs:
+      mod:
+        description: "ara ya da indir"
+        required: true
+        default: ara
+      girdi:
+        description: "ara: sorgular (| ile ayır) · indir: ses numaraları (boşlukla ayır)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  freesound:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ara
+        if: inputs.mod == 'ara'
+        env:
+          GIRDI: ${{ inputs.girdi }}
+        run: |
+          IFS='|' read -ra SORGULAR <<< "$GIRDI"
+          python3 scripts/freesound.py ara "${SORGULAR[@]}"
+
+      - name: İndir ve kaydet
+        if: inputs.mod == 'indir'
+        env:
+          GIRDI: ${{ inputs.girdi }}
+        run: |
+          python3 scripts/freesound.py indir $GIRDI
+          git add assets/ses _data/ses_kaynaklari.json
+          if git diff --cached --quiet; then echo "İndirilen yok."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Freesound'dan CC0 sesler: $GIRDI"
+          git pull --rebase origin main
+          git push
