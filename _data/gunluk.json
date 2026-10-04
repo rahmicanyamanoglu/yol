@@ -1,1 +1,136 @@
-{"guncelleme": null, "kentler": {}}
+{
+ "guncelleme": "2026-10-03",
+ "kentler": {
+  "istanbul": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 20.2,
+    "sc_min": 15.6,
+    "yagis": 0.0,
+    "ruzgar": 28.6,
+    "kod": 2
+   }
+  ],
+  "toronto": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 16.7,
+    "sc_min": 7.2,
+    "yagis": 0.0,
+    "ruzgar": 12.6,
+    "kod": 3
+   }
+  ],
+  "lund": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 17.3,
+    "sc_min": 10.4,
+    "yagis": 0.0,
+    "ruzgar": 12.2,
+    "kod": 3
+   }
+  ],
+  "utrecht": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 20.7,
+    "sc_min": 10.0,
+    "yagis": 0.0,
+    "ruzgar": 9.0,
+    "kod": 3
+   }
+  ],
+  "laquila": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 24.1,
+    "sc_min": 8.5,
+    "yagis": 0.0,
+    "ruzgar": 13.8,
+    "kod": 3
+   }
+  ],
+  "pavia": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 24.6,
+    "sc_min": 13.4,
+    "yagis": 0.0,
+    "ruzgar": 9.0,
+    "kod": 3
+   }
+  ],
+  "valencia": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 24.0,
+    "sc_min": 20.7,
+    "yagis": 14.1,
+    "ruzgar": 15.9,
+    "kod": 95
+   }
+  ],
+  "atina": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 21.0,
+    "sc_min": 16.9,
+    "yagis": 0.2,
+    "ruzgar": 24.3,
+    "kod": 3
+   }
+  ],
+  "anvers": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 20.5,
+    "sc_min": 12.3,
+    "yagis": 0.0,
+    "ruzgar": 10.1,
+    "kod": 3
+   }
+  ],
+  "torino": [],
+  "budapeste": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 24.1,
+    "sc_min": 12.7,
+    "yagis": 0.0,
+    "ruzgar": 7.2,
+    "kod": 3
+   }
+  ],
+  "bordeaux": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 25.6,
+    "sc_min": 18.9,
+    "yagis": 0.0,
+    "ruzgar": 10.6,
+    "kod": 3
+   }
+  ],
+  "munih": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 20.4,
+    "sc_min": 13.8,
+    "yagis": 0.0,
+    "ruzgar": 7.6,
+    "kod": 3
+   }
+  ],
+  "sofya": [
+   {
+    "t": "2026-10-03",
+    "sc_max": 17.9,
+    "sc_min": 6.6,
+    "yagis": 0.0,
+    "ruzgar": 13.9,
+    "kod": 3
+   }
+  ]
+ }
+}
