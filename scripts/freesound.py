@@ -25,7 +25,7 @@ import urllib.request
 KOK = pathlib.Path(__file__).resolve().parent.parent
 SES = KOK / "assets" / "ses"
 KAYNAK = KOK / "_data" / "ses_kaynaklari.json"
-AJAN = "Mozilla/5.0 (rcyamanoglu.com/yol; CC0 ses arayışı)"
+AJAN = "Mozilla/5.0 (compatible; rcyamanoglu.com/yol CC0 sound search)"  # başlıklar yalnız ASCII olabilir
 CC0 = "creativecommons.org/publicdomain/zero"
 
 
