@@ -41,6 +41,13 @@ def meta(sayfa, ad):
     return html.unescape(m.group(1)) if m else None
 
 
+def onizleme(sayfa):
+    # og:audio bazen "https://freesound.orghttps://cdn..." gibi bozuk gelir; cdn adresini ayıkla
+    # ve düşük kaliteli (-lq) yerine yüksek kaliteli (-hq) önizlemeyi iste
+    m = re.search(r"https://cdn\.freesound\.org/previews/\d+/\d+_\d+-(?:hq|lq)\.mp3", sayfa)
+    return m.group(0).replace("-lq.mp3", "-hq.mp3") if m else None
+
+
 def ses_bilgisi(kisi, kimlik):
     url = f"https://freesound.org/people/{kisi}/sounds/{kimlik}/"
     sayfa = getir(url)
@@ -51,7 +58,7 @@ def ses_bilgisi(kisi, kimlik):
         "kisi": kisi,
         "baslik": meta(sayfa, "og:title"),
         "aciklama": (meta(sayfa, "og:description") or meta(sayfa, "description") or "")[:400],
-        "onizleme": meta(sayfa, "og:audio") or (re.search(r'https://cdn\.freesound\.org/previews/[^"\']+-hq\.mp3', sayfa) or [None])[0],
+        "onizleme": onizleme(sayfa),
         "cc0": CC0 in sayfa,
         "sure": sure.group(1) if sure else None,
         "etiketler": etiketler[:20],
@@ -116,7 +123,11 @@ def indir(kimlikler):
             print(f"[indir] {kimlik}: önizleme yok", file=sys.stderr)
             continue
         dosya = SES / f"freesound-{b['id']}.mp3"
-        dosya.write_bytes(getir(b["onizleme"], ikili=True))
+        try:
+            veri = getir(b["onizleme"], ikili=True)
+        except Exception:
+            veri = getir(b["onizleme"].replace("-hq.mp3", "-lq.mp3"), ikili=True)
+        dosya.write_bytes(veri)
         print(f"[indir] {kimlik}: {b['baslik']} → {dosya.relative_to(KOK)} ({dosya.stat().st_size // 1024} KB)")
         if b["id"] not in var:
             kaynaklar.append({k: b[k] for k in ("id", "kisi", "baslik", "sayfa", "sure")} | {"dosya": "/" + str(dosya.relative_to(KOK)), "lisans": "CC0"})
