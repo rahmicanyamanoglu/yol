@@ -6,12 +6,13 @@ on:
   workflow_dispatch:
     inputs:
       mod:
-        description: "ara ya da indir"
+        description: "ara, indir ya da sikistir"
         required: true
         default: ara
       girdi:
-        description: "ara: sorgular (| ile ayır) · indir: ses numaraları (boşlukla ayır)"
-        required: true
+        description: "ara: sorgular (| ile ayır) · indir: ses numaraları (boşlukla ayır) · sikistir: boş bırakılabilir"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -41,5 +42,27 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "Freesound'dan CC0 sesler: $GIRDI"
+          git pull --rebase origin main
+          git push
+
+      - name: Sıkıştır (mono, 80 kbps, en fazla 90 sn)
+        if: inputs.mod == 'sikistir'
+        run: |
+          for f in assets/ses/*.mp3; do
+            # zaten küçük ve kısa olanlara dokunma
+            sure=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$f" | cut -d. -f1)
+            boyut=$(stat -c %s "$f")
+            if [ "$boyut" -lt 700000 ] && [ "${sure:-0}" -le 90 ]; then continue; fi
+            kes=$(( sure > 90 ? 90 : sure ))
+            sonu=$(( kes > 4 ? kes - 3 : 0 ))
+            ffmpeg -v error -y -i "$f" -t "$kes" -ac 1 -b:a 80k -af "afade=t=in:d=0.5,afade=t=out:st=${sonu}:d=3" "${f%.mp3}.tmp.mp3"
+            mv "${f%.mp3}.tmp.mp3" "$f"
+            echo "$f: $(( boyut / 1024 )) KB → $(( $(stat -c %s "$f") / 1024 )) KB"
+          done
+          git add assets/ses
+          if git diff --cached --quiet; then echo "Değişen yok."; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Sesleri sıkıştır: mono, 80 kbps, en fazla 90 sn"
           git pull --rebase origin main
           git push
