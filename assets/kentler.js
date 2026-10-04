@@ -733,6 +733,8 @@
         Ses.baslat({
             sesler: simdiki.sesler,
             dil: simdiki.dil,
+            lehce: simdiki.lehce,
+            kayitlar: simdiki.kayitlar,
             bicim: icSahne.bicim,
             hava: icSahne.hava,
             A: icSahne.A,

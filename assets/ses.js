@@ -289,25 +289,61 @@
     var BAGIRIS = {
         it: ['Dai, dai!', 'Piano, piano!', 'Attenzione!', 'Ferma! Ferma!', 'Vai, vai, vai!', 'Più a destra!', 'Giù! Giù!',
              'Andiamo, ragazzi!', 'Oh! Mario! Vieni qua!', 'Ancora un po\'!', 'Basta così!', 'Ma che fai?!', 'Pausa caffè!',
-             'Su! Tira su!', 'Occhio!', 'Aspetta, aspetta!', 'Dove sta il martello?', 'Forza!']
+             'Su! Tira su!', 'Occhio!', 'Aspetta, aspetta!', 'Dove sta il martello?', 'Forza!'],
+        // Abruzzo lehçesi (aquilano); yazım konuşma motoru doğru okusun diye sadeleştirildi
+        abruzzese: ['Abbada!', 'Fa\' piane, fa\' piane!', 'Jamo, jamo!', 'Mo\' vié qua!', 'Uagliò, passeme lu martelle!',
+                    'Ma che sta a fa\'?!', 'Mo\' basta!', 'Ndó sta lu cimende?', 'Mannaggia!', 'Tira su, tira su!',
+                    'Ferme! Ferme!', 'Piane, piane!', 'Ji vaje a magnà!', 'Oh! Abbada a lu muro!', 'Daje, ca è tardi!']
     };
+    // İtalyanca erkek sesleri (Apple, Microsoft, Edge); kadın sesleri de ayrıca dışarıda tutulur
+    var ERKEK = /luca|diego|cosimo|giuseppe|benigno|calimero|cataldo|gianni|lisandro|rinaldo|marco|matteo|andrea|male|uomo/i;
+    var KADIN = /alice|federica|paola|elsa|isabella|emma|fiamma|imelda|irma|palmira|pierina|female|donna|google italiano/i;
     var konusma = window.speechSynthesis || null;
     function dilSesi(dil) {
         if (!konusma) return null;
         var kok = dil.split('-')[0].toLowerCase();
-        var sesler = konusma.getVoices().filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(kok) === 0; });
-        return sesler[Math.floor(Math.random() * sesler.length)] || null;
+        var hepsi = konusma.getVoices().filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(kok) === 0; });
+        var erkek = hepsi.filter(function (v) { return ERKEK.test(v.name) && !KADIN.test(v.name); });
+        if (erkek.length) return { ses: erkek[Math.floor(Math.random() * erkek.length)], erkek: true };
+        return hepsi.length ? { ses: hepsi[Math.floor(Math.random() * hepsi.length)], erkek: false } : null;
     }
     if (konusma && konusma.getVoices) konusma.getVoices(); // sesleri önceden yükle
+
+    // Gerçek kayıtlar (yazıdaki "kayitlar" listesi) varsa konuşma motoru yerine onlar çalar
+    var kayitlar = [];
+    function kayitlariYukle(liste) {
+        kayitlar = [];
+        (liste || []).forEach(function (url) {
+            fetch(url).then(function (y) { return y.arrayBuffer(); })
+                .then(function (v) { return new Promise(function (ok, red) { ctx.decodeAudioData(v, ok, red); }); })
+                .then(function (tampon) { kayitlar.push(tampon); })
+                .catch(function () { /* bozuk ya da eksik dosya: atla */ });
+        });
+    }
+    function kayitCal() {
+        if (!kayitlar.length) return false;
+        var s = ctx.createBufferSource(), g = kazanc(rnd(0.45, 0.8)), p = pan(rnd(-0.7, 0.7));
+        s.buffer = kayitlar[Math.floor(Math.random() * kayitlar.length)];
+        s.playbackRate.value = rnd(0.94, 1.06);
+        bagla(s, g, p, ana);
+        s.start();
+        birak(p, s.buffer.duration + 1);
+        return true;
+    }
+
     OLAY['bağırış'] = function () {
+        if (kayitCal()) return;
         var dil = (ayar && ayar.dil) || 'it-IT', kok = dil.split('-')[0];
-        var liste = BAGIRIS[kok], ses = dilSesi(dil);
-        if (!liste || !ses || konusma.speaking) return;
+        var liste = BAGIRIS[(ayar && ayar.lehce) || kok] || BAGIRIS[kok], secim = dilSesi(dil);
+        if (!liste || !secim || konusma.speaking) return;
         var kac = Math.random() < 0.35 ? 2 : 1;
         for (var i = 0; i < kac; i++) {
             var u = new SpeechSynthesisUtterance(liste[Math.floor(Math.random() * liste.length)]);
-            u.voice = ses; u.lang = ses.lang;
-            u.rate = rnd(1.05, 1.3); u.pitch = rnd(0.7, 1.15); u.volume = rnd(0.35, 0.6);
+            u.voice = secim.ses; u.lang = secim.ses.lang;
+            u.rate = rnd(1.05, 1.3);
+            // erkek ses yoksa elimizdeki sesi kalınlaştır
+            u.pitch = secim.erkek ? rnd(0.75, 1) : rnd(0.1, 0.35);
+            u.volume = rnd(0.45, 0.7);
             konusma.speak(u);
         }
     };
@@ -337,6 +373,7 @@
         ana.gain.linearRampToValueAtTime(0.9, ctx.currentTime + 1.5);
 
         var sesler = (ayar.sesler || '').split(/[\s,]+/).filter(Boolean);
+        kayitlariYukle(ayar.kayitlar);
         var h = ayar.hava || {}, A = ayar.A || 0.5;
         var sus = h.kar ? 0.5 : 1; // kar sesi bastırır
 
