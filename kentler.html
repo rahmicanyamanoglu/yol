@@ -49,7 +49,7 @@ window.YOL_KENTLER = [
 {%- for post in site.posts reversed -%}
 {%- if post.konum -%}
 {%- assign dolu = post.content | strip_html | strip | size -%}
-  { "baslik": {{ post.title | jsonify }}, "slug": {{ post.slug | jsonify }}, "yer": {{ post.yer | jsonify }}, "donem": {{ post.donem | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "konum": {{ post.konum | jsonify }}, "kent": {{ post.kent | jsonify }}, "hayal_adi": {{ post.hayal_adi | jsonify }}, "hayal": {{ post.hayal | jsonify }}, "sesler": {{ post.sesler | jsonify }}, "gunler": {{ site.data.gunluk.kentler[post.slug] | jsonify }}, "dolu": {% if dolu > 0 %}true{% else %}false{% endif %} },
+  { "baslik": {{ post.title | jsonify }}, "slug": {{ post.slug | jsonify }}, "yer": {{ post.yer | jsonify }}, "donem": {{ post.donem | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "konum": {{ post.konum | jsonify }}, "kent": {{ post.kent | jsonify }}, "hayal_adi": {{ post.hayal_adi | jsonify }}, "hayal": {{ post.hayal | jsonify }}, "sesler": {{ post.sesler | jsonify }}, "dil": {{ post.dil | jsonify }}, "gunler": {{ site.data.gunluk.kentler[post.slug] | jsonify }}, "dolu": {% if dolu > 0 %}true{% else %}false{% endif %} },
 {%- endif -%}
 {%- endfor -%}
 ];

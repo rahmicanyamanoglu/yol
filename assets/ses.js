@@ -209,6 +209,109 @@
         }
     };
 
+    /* ---- inşaat: çekiç, kırıcı, taşlama, vinç ---- */
+    var INSAAT = {
+        cekic: function () {
+            var t = ctx.currentTime, p = pan(rnd(-0.7, 0.7)), kac = 3 + Math.floor(Math.random() * 6), ara = rnd(0.32, 0.55);
+            p.connect(ana);
+            for (var i = 0; i < kac; i++) {
+                var t0 = t + i * ara * rnd(0.9, 1.1);
+                var s = gurultuKaynagi(), f = filtre('bandpass', rnd(2200, 3000), 2), g = kazanc(0);
+                bagla(s, f, g, p);
+                zarf(g, t0, 0.35, 0.002, 0.07);
+                s.start(t0, Math.random()); s.stop(t0 + 0.1);
+                var o = ctx.createOscillator(), og = kazanc(0);
+                o.frequency.value = rnd(1500, 1900); bagla(o, og, p);
+                zarf(og, t0, 0.06, 0.002, 0.25);
+                o.start(t0); o.stop(t0 + 0.3);
+            }
+            birak(p, kac * ara + 1);
+        },
+        kirici: function () {
+            var t = ctx.currentTime, sure = rnd(1.5, 3.5), s = gurultuKaynagi(), f = filtre('bandpass', rnd(700, 1000), 1.2);
+            var am = kazanc(0), g = kazanc(0), p = pan(rnd(-0.6, 0.6));
+            bagla(s, f, am, g, p, ana);
+            var o = ctx.createOscillator(), og = kazanc(0.5);
+            o.type = 'square'; o.frequency.value = rnd(18, 24);
+            bagla(o, og, am.gain);
+            g.gain.setValueAtTime(0, t);
+            g.gain.linearRampToValueAtTime(0.28, t + 0.05);
+            g.gain.setValueAtTime(0.28, t + sure);
+            g.gain.linearRampToValueAtTime(0, t + sure + 0.1);
+            s.start(t, Math.random()); s.stop(t + sure + 0.2); o.start(t); o.stop(t + sure + 0.2);
+            birak(p, sure + 0.5);
+        },
+        taslama: function () {
+            var t = ctx.currentTime, sure = rnd(2, 4), p = pan(rnd(-0.6, 0.6)), g = kazanc(0);
+            bagla(g, p, ana);
+            var o = ctx.createOscillator(), lp = filtre('bandpass', 3000, 3);
+            o.type = 'sawtooth';
+            o.frequency.setValueAtTime(rnd(2600, 3000), t);
+            o.frequency.linearRampToValueAtTime(rnd(3300, 3800), t + 0.4);
+            o.frequency.linearRampToValueAtTime(rnd(3000, 3400), t + sure);
+            bagla(o, lp, g);
+            var s = gurultuKaynagi(), hp = filtre('highpass', 4000, 0.7), sg = kazanc(0.5);
+            bagla(s, hp, sg, g);
+            g.gain.setValueAtTime(0.0001, t);
+            g.gain.exponentialRampToValueAtTime(0.05, t + 0.3);
+            g.gain.setValueAtTime(0.05, t + sure);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + sure + 0.6);
+            o.start(t); o.stop(t + sure + 0.7); s.start(t, Math.random()); s.stop(t + sure + 0.7);
+            birak(p, sure + 1);
+        },
+        vinc: function () {
+            var t = ctx.currentTime, p = pan(rnd(-0.8, 0.8)), kac = 4 + Math.floor(Math.random() * 4);
+            p.connect(ana);
+            for (var i = 0; i < kac; i++) {
+                var o = ctx.createOscillator(), g = kazanc(0), t0 = t + i * 0.8;
+                o.frequency.value = 1050; bagla(o, g, p);
+                g.gain.setValueAtTime(0, t0);
+                g.gain.linearRampToValueAtTime(0.035, t0 + 0.01);
+                g.gain.setValueAtTime(0.035, t0 + 0.4);
+                g.gain.linearRampToValueAtTime(0, t0 + 0.41);
+                o.start(t0); o.stop(t0 + 0.45);
+            }
+            birak(p, kac * 0.8 + 0.5);
+        }
+    };
+    OLAY['inşaat'] = function () {
+        var secim = Math.random();
+        if (secim < 0.4) INSAAT.cekic();
+        else if (secim < 0.65) INSAAT.kirici();
+        else if (secim < 0.85) INSAAT.taslama();
+        else INSAAT.vinc();
+    };
+
+    /* ---- bağırışlar: tarayıcının konuşma motoruyla, kentin dilinde ----
+       Konuşma Web Audio'dan geçmez; bu yüzden ses düğmesi ve durdur() onu
+       ayrıca keser. O dilde bir ses yoksa hiç bağırılmaz: yanlış aksanla
+       konuşan bir işçi, susan bir işçiden kötüdür. */
+    var BAGIRIS = {
+        it: ['Dai, dai!', 'Piano, piano!', 'Attenzione!', 'Ferma! Ferma!', 'Vai, vai, vai!', 'Più a destra!', 'Giù! Giù!',
+             'Andiamo, ragazzi!', 'Oh! Mario! Vieni qua!', 'Ancora un po\'!', 'Basta così!', 'Ma che fai?!', 'Pausa caffè!',
+             'Su! Tira su!', 'Occhio!', 'Aspetta, aspetta!', 'Dove sta il martello?', 'Forza!']
+    };
+    var konusma = window.speechSynthesis || null;
+    function dilSesi(dil) {
+        if (!konusma) return null;
+        var kok = dil.split('-')[0].toLowerCase();
+        var sesler = konusma.getVoices().filter(function (v) { return v.lang && v.lang.toLowerCase().indexOf(kok) === 0; });
+        return sesler[Math.floor(Math.random() * sesler.length)] || null;
+    }
+    if (konusma && konusma.getVoices) konusma.getVoices(); // sesleri önceden yükle
+    OLAY['bağırış'] = function () {
+        var dil = (ayar && ayar.dil) || 'it-IT', kok = dil.split('-')[0];
+        var liste = BAGIRIS[kok], ses = dilSesi(dil);
+        if (!liste || !ses || konusma.speaking) return;
+        var kac = Math.random() < 0.35 ? 2 : 1;
+        for (var i = 0; i < kac; i++) {
+            var u = new SpeechSynthesisUtterance(liste[Math.floor(Math.random() * liste.length)]);
+            u.voice = ses; u.lang = ses.lang;
+            u.rate = rnd(1.05, 1.3); u.pitch = rnd(0.7, 1.15); u.volume = rnd(0.35, 0.6);
+            konusma.speak(u);
+        }
+    };
+
     function gok() {
         if (!aktif || !ctx) return;
         var t = ctx.currentTime + rnd(0.4, 1.8), s = gurultuKaynagi(), f = filtre('lowpass', 140), g = kazanc(0);
@@ -247,6 +350,18 @@
         if (sesler.indexOf('bisiklet') > -1) tekrarla(OLAY['bisiklet'], 7, 18);
         if (sesler.indexOf('kilise') > -1) tekrarla(OLAY['kilise'], 20, 45);
         if (sesler.indexOf('tramvay') > -1) tekrarla(OLAY['tramvay'], 12, 28);
+        if (sesler.indexOf('inşaat') > -1) {
+            // arkada sürekli çalışan bir dizel motoru
+            var motor = ctx.createOscillator(), mlp = filtre('lowpass', 160), mg = kazanc(0);
+            motor.type = 'sawtooth'; motor.frequency.value = 46;
+            bagla(motor, mlp, mg, ana);
+            mg.gain.linearRampToValueAtTime(0.06 * sus, ctx.currentTime + 2);
+            motor.start();
+            kaynaklar.push(motor);
+            lfo(motor.frequency, 0.3, 2);
+            tekrarla(OLAY['inşaat'], 1.5, 5);
+        }
+        if (sesler.indexOf('bağırış') > -1) tekrarla(OLAY['bağırış'], 6, 16);
         if (sesler.indexOf('cırcır') > -1 && (ayar.sicaklik == null || ayar.sicaklik >= 20)) {
             var c = katman('bandpass', 5200, 9, 0.025);
             lfo(c.g.gain, 28, 0.02);
@@ -268,6 +383,7 @@
 
     function durdur(hemen) {
         aktif = false;
+        if (konusma) konusma.cancel();
         zamanlayicilar.forEach(clearTimeout);
         zamanlayicilar = [];
         if (!ctx || !ana) return;

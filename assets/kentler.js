@@ -732,6 +732,7 @@
         if (!Ses || !Ses.destek || !icSahne || !simdiki || !sesAcik()) return;
         Ses.baslat({
             sesler: simdiki.sesler,
+            dil: simdiki.dil,
             bicim: icSahne.bicim,
             hava: icSahne.hava,
             A: icSahne.A,
