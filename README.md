@@ -38,7 +38,7 @@ Bir kent açıldığında sesleri çalar (pencerede "Ses açık/kapalı" düğme
 
 Kentlerin çoğunda gerçek kayıtlar çalar (`kayitlar` alanı): `ortam` ve `inşaat` kesintisiz yatak, `bağırış` kısa kesit, diğer türler (metro, metrobüs, tramvay, martı, kalabalık, pazar...) ara ara birkaç saniyelik kesit. Bir türün kaydı varsa sentezlenmiş karşılığı susar. Kayıtların düzeyi tarayıcıda ölçülüp eşitlenir.
 
-Yeni kayıt eklemek: **Actions → Freesound sesleri → Run workflow**, `mod: ara` ve sorgular (`istanbul|metro|...`) ile CC0 adayları iş günlüğüne listelenir; `mod: indir` ve ses numaralarıyla indirilir (CC0 değilse indirilmez, kaynak `_data/ses_kaynaklari.json`'a yazılır); `mod: sikistir` büyük dosyaları mono 80 kbps'e ve 90 saniyeye indirir. Kaydedenlerin listesi Hakkında sayfasının altında.
+Yeni kayıt eklemek: **Actions → Freesound sesleri → Run workflow**, `mod: ara` ve sorgular (`istanbul|metro|...`) ile CC0 adayları iş günlüğüne listelenir; `mod: indir` ve ses numaralarıyla indirilir (CC0 değilse indirilmez, kaynak `_data/ses_kaynaklari.json`'a yazılır); `mod: sikistir` büyük dosyaları mono 80 kbps'e ve 90 saniyeye indirir.
 
 ## Günlük veri
 
