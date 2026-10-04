@@ -220,16 +220,28 @@ svg .e.hali-zemin { fill: var(--pas); fill-opacity: .07; stroke: var(--pas); }
 svg .yansima { opacity: .38; }
 
 /* canlı ögeler: yolcular, iz, yağmur, kayık, gök */
-svg .canli { opacity: 0; animation: belir 1s ease-out 1.6s forwards; }
-.hazir svg .canli { animation: none; opacity: 1; }
-.kent-kart:not(.ciziliyor) svg .canli { animation: none; opacity: 0; }
+/* görünürlükle açılır: opaklığı JS ayarlayan ögeleri (esinti, şimşek, sis) ezmesin diye */
+svg .canli { visibility: hidden; animation: belir 0s linear 1.6s forwards; }
+.hazir svg .canli { animation: none; visibility: visible; }
+.kent-kart:not(.ciziliyor) svg .canli { animation: none; visibility: hidden; }
 svg .yolcu { fill: var(--pas); stroke: var(--zemin, var(--kagit)); stroke-width: 1.5; }
 svg .iz { fill: none; stroke: var(--pas); stroke-width: 1.4; stroke-opacity: .45; stroke-linecap: round; stroke-linejoin: round; }
 svg .damla { stroke: var(--vurgu); stroke-width: 1; stroke-opacity: .5; stroke-linecap: round; }
 svg .kayik { fill: var(--zemin, var(--kagit)); stroke: currentColor; stroke-width: 1.2; }
 svg .yelken { fill: var(--pas); fill-opacity: .25; stroke: currentColor; stroke-width: 1; }
 svg .gok { opacity: .1; }
-@keyframes belir { to { opacity: 1; } }
+svg .gok.kapali { opacity: .16; }
+svg .gunes { fill: var(--altin); fill-opacity: .35; stroke: var(--altin); stroke-width: 1.2; }
+svg .isin { stroke: var(--altin); stroke-width: 1.4; stroke-linecap: round; }
+svg .bulut { fill: var(--zemin, var(--kagit)); fill-opacity: .9; stroke: var(--soluk); stroke-width: .8; stroke-opacity: .6; }
+svg .bulut.kapali { fill: var(--soluk); fill-opacity: .1; stroke-opacity: .45; }
+svg .kus { fill: none; stroke: currentColor; stroke-width: 1.1; stroke-linecap: round; }
+svg .esinti { stroke: var(--soluk); stroke-width: 1; stroke-linecap: round; }
+svg .sis { fill: var(--zemin, var(--kagit)); opacity: .5; }
+svg .kar-tanesi { fill: var(--zemin, var(--kagit)); stroke: var(--soluk); stroke-width: .6; }
+svg .simsek-isik { fill: #fffbe8; opacity: 0; }
+svg .simsek { fill: none; stroke: var(--altin); stroke-width: 2.2; stroke-linejoin: round; opacity: 0; }
+@keyframes belir { to { visibility: visible; } }
 
 /* kendini çizen kent */
 .kent-kart:not(.ciziliyor) svg .e { visibility: hidden; }
@@ -246,7 +258,7 @@ svg .gok { opacity: .1; }
     100% { stroke-dashoffset: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
-    svg .canli { animation: none; opacity: 1; }
+    svg .canli { animation: none; visibility: visible; }
     .e, .e.yeni { animation: none !important; stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
 }
 
@@ -283,7 +295,10 @@ svg .gok { opacity: .1; }
 .anlati span:last-child { font-family: 'Fraunces', serif; font-size: 1.25rem; line-height: 1.45; }
 .anlati .soluk { color: var(--soluk); font-style: italic; }
 .ipucu { font-size: .85rem; color: var(--soluk); font-style: italic; }
-.gunluk { font-size: .9rem; color: var(--murekkep); border-left: 2px solid var(--altin); padding-left: .75rem; }
+.gunluk { font-size: .85rem; color: var(--soluk); letter-spacing: .02em; }
+.gunluk:empty { display: none; }
+.dugme.sade { border-color: transparent; color: var(--soluk); padding-left: .4rem; padding-right: .4rem; }
+.dugme.sade:hover { background: transparent; color: var(--murekkep); }
 .kent-eylem { display: flex; flex-wrap: wrap; gap: .5rem; }
 
 .isaret {

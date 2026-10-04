@@ -465,26 +465,146 @@
         };
     };
 
-    /* ---- günün havası: yağmur ve gökyüzü ---- */
+    /* ---- günün havası ----
+       Son günün verisi kentin üstündeki havayı kurar: gökyüzü rengi, güneş,
+       bulut, sis, esinti, kuşlar, yağmur, kar ve şimşek. Hava kodları WMO:
+       0-1 açık, 2 parçalı, 3 kapalı, 45-48 sis, 51-67 ve 80-82 yağmur,
+       71-77 ve 85-86 kar, 95-99 fırtına. Hava ayrı bir tohum kullanır;
+       kentin biçimi havaya göre değişmez, yalnızca üstündeki hava değişir. */
     function gokRengi(sc) {
         // soğuk mavi → ılık yeşil → sıcak kehribar
         var o = sinirla((sc + 5) / 40, 0, 1);
         return 'hsl(' + Math.round(210 - o * 180) + ', ' + Math.round(35 + o * 35) + '%, 55%)';
     }
-    function yagmur(c, r, mm) {
+    function havaTuru(g) {
+        var k = sayi(g.kod) ? g.kod : null, mm = sayi(g.yagis) ? g.yagis : 0, sc = sayi(g.sc_max) ? g.sc_max : 15;
+        var kar = (k >= 71 && k <= 77) || k === 85 || k === 86 || (mm >= 0.5 && sc < 2);
+        var yagmur = !kar && (mm >= 0.5 || (k >= 51 && k <= 67) || (k >= 80 && k <= 82) || k >= 95);
+        return {
+            acik: k !== null ? k <= 1 : mm < 0.5,
+            bulut: k === null ? (mm >= 0.5 ? 3 : 1) : k === 0 ? 0 : k <= 2 ? k : 3,
+            sis: k === 45 || k === 48,
+            kar: kar,
+            yagmur: yagmur,
+            firtina: k >= 95,
+            mm: Math.max(mm, yagmur || kar ? 2 : 0)
+        };
+    }
+
+    function gokyuzu(c, r, h) {
+        var g = c.katman(0.1);
+        if (h.acik) {
+            var gunes = c.grup(g), cx = arasi(r, 430, 520), cy = arasi(r, 80, 130);
+            c.canli(gunes, 'circle', { cx: cx, cy: cy, r: 26 }, 'gunes');
+            var isinlar = c.grup(gunes);
+            for (var i = 0; i < 12; i++) {
+                var a = i / 12 * Math.PI * 2;
+                c.canli(isinlar, 'line', { x1: cx + Math.cos(a) * 34, y1: cy + Math.sin(a) * 34, x2: cx + Math.cos(a) * 46, y2: cy + Math.sin(a) * 46 }, 'isin');
+            }
+            c.hareket(function (t) {
+                isinlar.setAttribute('transform', 'rotate(' + (t * 6 % 360).toFixed(1) + ' ' + cx.toFixed(1) + ' ' + cy.toFixed(1) + ') ');
+                isinlar.style.opacity = (0.55 + 0.45 * Math.sin(t * 1.4)).toFixed(2);
+            });
+        }
+        var bulutSayisi = [0, 1, 3, 4][h.bulut] + (h.yagmur || h.kar ? 1 : 0);
+        for (var b = 0; b < bulutSayisi; b++) {
+            (function () {
+                var bg = c.grup(g), w = arasi(r, 50, 110), y = arasi(r, 40, 170), x0 = r() * 760, hiz = arasi(r, 4, 9);
+                var parca = 3 + Math.floor(r() * 3);
+                for (var k = 0; k < parca; k++) {
+                    c.canli(bg, 'ellipse', { cx: (k - parca / 2) * w / parca * 1.2, cy: -arasi(r, 0, w * 0.18), rx: w / parca * 1.1, ry: w * arasi(r, 0.16, 0.26) }, 'bulut' + (h.bulut >= 3 ? ' kapali' : ''));
+                }
+                c.hareket(function (t, A) {
+                    var x = (x0 + t * hiz * (0.5 + A * 2)) % 760 - 80;
+                    bg.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + y.toFixed(1) + ')');
+                });
+            })();
+        }
+        if (!h.yagmur && !h.kar && !h.sis) {
+            for (var q = 0; q < 4; q++) {
+                (function () {
+                    var kus = c.canli(g, 'path', { d: 'M-6 0 Q-3 -4 0 0 Q3 -4 6 0' }, 'kus');
+                    var y = arasi(r, 60, 200), x0 = r() * 800, hiz = arasi(r, 18, 30), faz = r() * 6;
+                    c.hareket(function (t) {
+                        var x = (x0 + t * hiz) % 800 - 100;
+                        var kanat = 0.6 + 0.4 * Math.sin(t * 9 + faz);
+                        kus.setAttribute('transform', 'translate(' + x.toFixed(1) + ' ' + (y + Math.sin(t * 0.8 + faz) * 8).toFixed(1) + ') scale(1 ' + kanat.toFixed(2) + ')');
+                    });
+                })();
+            }
+        }
+    }
+
+    function onHava(c, r, h) {
         var g = c.katman(1.15);
-        var damla = Math.round(sinirla(12 + mm * 7, 12, 90)), damlalar = [];
-        for (var i = 0; i < damla; i++) {
-            damlalar.push({ el: c.canli(g, 'line', {}, 'damla'), x: r() * 640, y: r() * 600, hiz: arasi(r, 260, 420), boy: arasi(r, 8, 16) });
+        // Esinti: rüzgâr ne kadar sertse o kadar çok ve hızlı çizgi
+        var esintiler = [];
+        for (var i = 0; i < 12; i++) {
+            esintiler.push({ el: c.canli(g, 'line', { x1: 0, y1: 0, x2: 0, y2: 0 }, 'esinti'), x: r() * 700, y: arasi(r, 60, 560), boy: arasi(r, 18, 60), hiz: arasi(r, 60, 120), sira: i / 12 });
         }
         c.hareket(function (t, A) {
-            var egim = 4 + A * 10;
-            damlalar.forEach(function (d) {
-                var y = (d.y + t * d.hiz) % 640 - 20, x = (d.x - (y / 600) * egim * 6) % 640;
-                d.el.setAttribute('x1', x.toFixed(1)); d.el.setAttribute('y1', y.toFixed(1));
-                d.el.setAttribute('x2', (x - egim * 0.3).toFixed(1)); d.el.setAttribute('y2', (y + d.boy).toFixed(1));
+            var gorunen = sinirla(A / 1.2, 0.15, 1);
+            esintiler.forEach(function (e) {
+                var x = (e.x + t * e.hiz * (0.6 + A * 2.2)) % 760 - 80;
+                var y = e.y + Math.sin(t * 1.3 + e.x) * 6;
+                e.el.setAttribute('x1', x.toFixed(1)); e.el.setAttribute('y1', y.toFixed(1));
+                e.el.setAttribute('x2', (x + e.boy * (0.5 + A)).toFixed(1)); e.el.setAttribute('y2', (y + 1).toFixed(1));
+                e.el.style.opacity = e.sira < gorunen ? (0.2 + 0.2 * Math.sin(t * 2 + e.x)).toFixed(2) : 0;
             });
         });
+        if (h.sis) {
+            for (var k = 0; k < 4; k++) {
+                (function () {
+                    var bant = c.canli(g, 'rect', { x: -200, y: arasi(r, 180, 520), width: 1000, height: arasi(r, 40, 90), rx: 40 }, 'sis');
+                    var faz = r() * 6, genlik = arasi(r, 30, 80);
+                    c.hareket(function (t) { bant.setAttribute('transform', 'translate(' + (Math.sin(t * 0.15 + faz) * genlik).toFixed(1) + ' 0)'); });
+                })();
+            }
+        }
+        if (h.yagmur) {
+            var damla = Math.round(sinirla(14 + h.mm * 6, 14, 90)), damlalar = [];
+            for (var d = 0; d < damla; d++) {
+                damlalar.push({ el: c.canli(g, 'line', {}, 'damla'), x: r() * 660, y: r() * 640, hiz: arasi(r, 280, 440), boy: arasi(r, 8, 16) });
+            }
+            c.hareket(function (t, A) {
+                var egim = 3 + A * 12;
+                damlalar.forEach(function (dm) {
+                    var y = (dm.y + t * dm.hiz) % 640 - 20, x = ((dm.x - (y / 600) * egim * 5) % 660 + 660) % 660 - 30;
+                    dm.el.setAttribute('x1', x.toFixed(1)); dm.el.setAttribute('y1', y.toFixed(1));
+                    dm.el.setAttribute('x2', (x - egim * 0.4).toFixed(1)); dm.el.setAttribute('y2', (y + dm.boy).toFixed(1));
+                });
+            });
+        }
+        if (h.kar) {
+            var taneler = [];
+            for (var n = 0; n < 60; n++) {
+                taneler.push({ el: c.canli(g, 'circle', { r: arasi(r, 1.2, 3) }, 'kar-tanesi'), x: r() * 620, y: r() * 640, hiz: arasi(r, 20, 50), faz: r() * 6 });
+            }
+            c.hareket(function (t, A) {
+                taneler.forEach(function (k) {
+                    var y = (k.y + t * k.hiz) % 640 - 20;
+                    var x = ((k.x + Math.sin(t * 0.9 + k.faz) * 14 + t * A * 12) % 620 + 620) % 620 - 10;
+                    k.el.setAttribute('cx', x.toFixed(1)); k.el.setAttribute('cy', y.toFixed(1));
+                });
+            });
+        }
+        if (h.firtina) {
+            var isik = c.canli(g, 'rect', { x: 0, y: 0, width: 600, height: 600 }, 'simsek-isik');
+            var cakma = c.canli(g, 'path', { d: '' }, 'simsek');
+            var donem = arasi(r, 6, 9), sonCakma = -1;
+            c.hareket(function (t) {
+                var p = t % donem, an = Math.floor(t / donem);
+                var yaniyor = p < 0.12 || (p > 0.22 && p < 0.3);
+                isik.style.opacity = yaniyor ? 0.35 : 0;
+                cakma.style.opacity = yaniyor ? 1 : 0;
+                if (an !== sonCakma) {
+                    sonCakma = an;
+                    var x = 80 + ((an * 7919) % 440), y = 0, yol = 'M' + x + ' ' + y;
+                    while (y < 330) { y += 30 + ((an * 31 + y) % 30); x += ((an + y) % 2 ? 1 : -1) * (10 + (y % 17)); yol += ' L' + x + ' ' + y; }
+                    cakma.setAttribute('d', yol);
+                }
+            });
+        }
     }
 
     /* ---- bir kenti kur ---- */
@@ -495,18 +615,21 @@
         var slug = kent.slug || kent.baslik;
         var bicim = BICIMLER[kent.kent] ? kent.kent : SIRA[karma(slug) % SIRA.length];
         var r = tohum(karma(slug + ':' + bicim));
+        var rHava = tohum(karma(slug + ':hava'));
         var gunler = (kent.gunler || []).slice(-GUN_SINIRI);
         var son = gunler.length ? gunler[gunler.length - 1] : null;
+        var h = son ? havaTuru(son) : null;
 
         if (son && sayi(son.sc_max)) {
             var gok = document.createElementNS(NS, 'rect');
             gok.setAttribute('width', 600); gok.setAttribute('height', 600);
-            gok.setAttribute('class', 'gok');
+            gok.setAttribute('class', 'gok' + (h && h.bulut >= 3 ? ' kapali' : ''));
             gok.style.fill = gokRengi((son.sc_max + (sayi(son.sc_min) ? son.sc_min : son.sc_max)) / 2);
             svg.appendChild(gok);
         }
 
         var c = new Cizer(svg);
+        if (h) gokyuzu(c, rHava, h);
         var ekle = KENTLER[bicim](c, r);
 
         // Her gün kente o günün verisiyle bir yapı ekler
@@ -515,7 +638,7 @@
             ekle(60 + gr() * 480, 140 + gr() * 360, gun, 'gun');
         });
 
-        if (son && sayi(son.yagis) && son.yagis >= 0.5) yagmur(c, r, son.yagis);
+        if (h) onHava(c, rHava, h);
 
         var sahne = {
             svg: svg,
@@ -525,7 +648,8 @@
             ekle: ekle,
             bicim: bicim,
             gunler: gunler,
-            son: son
+            son: son,
+            hava: h
         };
         sahneler.push(sahne);
         return sahne;
@@ -566,10 +690,7 @@
         alt.className = 'kent-alt';
         var ad = document.createElement('strong');
         ad.textContent = kent.hayal_adi || kent.baslik;
-        var tur = document.createElement('span');
-        tur.textContent = kent.bicimAd + (kent.hayal_adi ? ' · ' + kent.baslik : '') + (s.gunler.length ? ' · ' + s.gunler.length + ' gündür büyüyor' : '');
         alt.appendChild(ad);
-        alt.appendChild(tur);
         kart.appendChild(alt);
         kart.addEventListener('click', function () { ac(kent); });
         atlas.appendChild(kart);
@@ -596,15 +717,17 @@
         return Number(v).toLocaleString('tr-TR', { maximumFractionDigits: basamak || 0 });
     }
     function gunlukYazi(s) {
-        if (!s.son) return 'Günlük veri henüz gelmedi. İlk güncellemeden sonra kent her gün havasıyla biraz daha büyüyecek.';
-        var g = s.son, parca = [];
-        if (sayi(g.sc_max)) parca.push(tr(g.sc_max) + '°' + (sayi(g.sc_min) ? ' / ' + tr(g.sc_min) + '°' : ''));
-        if (sayi(g.ruzgar)) parca.push('rüzgâr ' + tr(g.ruzgar) + ' km/sa');
-        if (sayi(g.yagis)) parca.push(g.yagis >= 0.5 ? 'yağış ' + tr(g.yagis, 1) + ' mm' : 'yağışsız');
-        var metin = parca.length ? 'Dün orada: ' + parca.join(' · ') + '. ' : '';
-        if (sayi(g.ilgi)) metin += 'Dünya onu Vikipedi\'de ' + tr(g.ilgi) + ' kez açtı. ';
-        metin += 'Kent ' + s.gunler.length + ' gündür bunlarla büyüyor.';
-        return metin;
+        if (!s.son || !s.hava) return '';
+        var h = s.hava, g = s.son, sozler = [];
+        if (h.firtina) sozler.push('fırtınalı');
+        else if (h.kar) sozler.push('karlı');
+        else if (h.yagmur) sozler.push('yağmurlu');
+        else if (h.sis) sozler.push('sisli');
+        else if (h.bulut >= 3) sozler.push('kapalı');
+        else if (h.bulut === 2) sozler.push('parçalı bulutlu');
+        else sozler.push('açık');
+        if (s.A >= 0.8) sozler.push('rüzgârlı');
+        return 'dün · ' + (sayi(g.sc_max) ? tr(g.sc_max) + '° · ' : '') + sozler.join(', ');
     }
 
     function mod(ad) {
@@ -637,9 +760,8 @@
         document.getElementById('kent-tur').textContent = kent.bicimAd;
         document.getElementById('kent-ad').textContent = kent.hayal_adi || kent.baslik;
         document.getElementById('kent-yer').textContent = [kent.yer, kent.donem].filter(Boolean).join(' · ');
-        var anlati = document.getElementById('kent-anlati');
-        anlati.textContent = kent.hayal || 'Bu kent henüz anlatılmadı.';
-        anlati.className = kent.hayal ? '' : 'soluk';
+        document.getElementById('kent-anlati').textContent = kent.hayal || '';
+        document.getElementById('kent-anlati').parentNode.hidden = !kent.hayal;
         document.getElementById('kent-gunluk').textContent = gunlukYazi(icSahne);
         var link = document.getElementById('kent-link');
         link.href = kent.url;
