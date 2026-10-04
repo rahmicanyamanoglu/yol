@@ -6,7 +6,7 @@ harita: true
 ---
 <section class="giris">
     <h1>Görünmez Kentler</h1>
-    <p>Calvino'da Marco Polo, Kubilay Han'a gezdiği kentleri anlatır; ama anlattığı her kent biraz da hayal ettiği kenttir. Burada da gittiğim her yer, zihnimde başka bir mimariye dönüştü. Bir kente dokun, içine gir, ona bir şey ekle; sonra haritadaki halini gör.</p>
+    <p>Calvino'da Marco Polo, Kubilay Han'a gezdiği kentleri anlatır; ama anlattığı her kent biraz da hayal ettiği kenttir. Burada da gittiğim her yer, zihnimde başka bir mimariye dönüştü. Bir kente dokun, içine gir, ona bir şey ekle; sonra haritadaki halini gör. Kentler her gün, o günün havasıyla ve dünyanın onlara ne kadar baktığıyla biraz daha büyüyor.</p>
 </section>
 
 <div class="kentler" id="kentler"></div>
@@ -31,6 +31,7 @@ harita: true
                 <button type="button" data-mod="gorunen" aria-pressed="false">Görünen</button>
             </div>
             <p class="anlati"><span>Marco Polo anlatır</span><span id="kent-anlati"></span></p>
+            <p class="gunluk" id="kent-gunluk"></p>
             <p class="ipucu" id="kent-ipucu">Kente dokun: ona bir şey ekle. Eklediklerin bu tarayıcıda kalır.</p>
             <p class="kent-eylem">
                 <button type="button" class="dugme" id="kent-sil">Eklediklerimi sil</button>
@@ -47,7 +48,7 @@ window.YOL_KENTLER = [
 {%- for post in site.posts reversed -%}
 {%- if post.konum -%}
 {%- assign dolu = post.content | strip_html | strip | size -%}
-  { "baslik": {{ post.title | jsonify }}, "slug": {{ post.slug | jsonify }}, "yer": {{ post.yer | jsonify }}, "donem": {{ post.donem | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "konum": {{ post.konum | jsonify }}, "kent": {{ post.kent | jsonify }}, "hayal_adi": {{ post.hayal_adi | jsonify }}, "hayal": {{ post.hayal | jsonify }}, "dolu": {% if dolu > 0 %}true{% else %}false{% endif %} },
+  { "baslik": {{ post.title | jsonify }}, "slug": {{ post.slug | jsonify }}, "yer": {{ post.yer | jsonify }}, "donem": {{ post.donem | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "konum": {{ post.konum | jsonify }}, "kent": {{ post.kent | jsonify }}, "hayal_adi": {{ post.hayal_adi | jsonify }}, "hayal": {{ post.hayal | jsonify }}, "gunler": {{ site.data.gunluk.kentler[post.slug] | jsonify }}, "dolu": {% if dolu > 0 %}true{% else %}false{% endif %} },
 {%- endif -%}
 {%- endfor -%}
 ];

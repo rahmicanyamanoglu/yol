@@ -3,6 +3,7 @@ layout: post
 title: "Hikâyenin başlığı"
 yer: "Şehir, Ülke"
 konum: [41.01, 28.98]        # enlem, boylam — Google Maps'te yere sağ tıkla, ilk satırdaki sayılar
+wiki: "Istanbul"             # günlük veri için İngilizce Vikipedi sayfasının adı
 ozet: "Listede görünecek bir-iki cümlelik özet."
 donem: "Mayıs 2024"           # isteğe bağlı; yazılırsa tarih yerine bu görünür
 hayal: "Gitmeden önce nasıl hayal etmiştim; Kentler sayfasında Marco Polo bunu anlatır"

@@ -26,6 +26,17 @@ Site GitHub Pages üzerinde Jekyll ile kendiliğinden oluşur; `main` dalına gi
 
 `kent` yazılmazsa biçim addan türetilir. Bir kente tıklayınca içeri girilir: çizim kendini çizer, imleçle derinlik kazanır, dokunulan yere kentin biçimine uygun yeni bir parça eklenir (ziyaretçinin tarayıcısında saklanır). "Görünen" düğmesi aynı yeri gerçek haritada gösterir; `hayal` cümlesi "Marco Polo anlatır" başlığıyla yanında durur.
 
+## Günlük veri
+
+`.github/workflows/gunluk.yml` her gün 05:17 UTC'de `scripts/gunluk.py`'yi çalıştırır. Betik her yer için dünkü havayı ([Open-Meteo](https://open-meteo.com/)) ve İngilizce Vikipedi görüntülenme sayısını (Wikimedia) çekip `_data/gunluk.json`'a ekler, değişiklik varsa kaydeder; site kendini yeniden kurar. Anahtar ya da hesap gerekmez.
+
+Kentler bu veriyle değişir:
+
+- **Her gün** kente o günün verisiyle biçimlenen bir yapı eklenir (son 90 gün). İnce kentte rüzgârlı gün daha uzun bir direk, ipler kentinde çok okunan gün daha çok bağlantı, asılı kentte yağışlı gün daha uzun bir askı, aynalı kentte sıcak gün daha yüksek bir kule, halıda havaya göre renklenen bir motif.
+- **Son günün** rüzgârı sallanmanın şiddetini, yağışı kente yağan yağmuru, sıcaklığı gökyüzünün rengini belirler.
+
+Elle çalıştırmak için: GitHub'da **Actions → Günlük kent verisi → Run workflow**. Yeni bir yer eklerken yazıya `wiki: "Sayfa_Adı"` (İngilizce Vikipedi başlığı) koymak yeterli.
+
 ## Yerelde denemek
 
 ```sh
