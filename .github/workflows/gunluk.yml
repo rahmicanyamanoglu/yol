@@ -2,7 +2,7 @@ name: Günlük kent verisi
 
 on:
   schedule:
-    - cron: "17 5 * * *"   # her gün 05:17 UTC
+    - cron: "17 9 * * *"   # her gün 09:17 UTC (Vikipedi sayıları o saate kadar yayımlanmış olur)
   workflow_dispatch:
 
 permissions:
