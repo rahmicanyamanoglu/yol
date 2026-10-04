@@ -48,6 +48,7 @@ jobs:
       - name: Sıkıştır (mono, 80 kbps, en fazla 90 sn)
         if: inputs.mod == 'sikistir'
         run: |
+          command -v ffmpeg >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null; }
           for f in assets/ses/*.mp3; do
             # zaten küçük ve kısa olanlara dokunma
             sure=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$f" | cut -d. -f1)
