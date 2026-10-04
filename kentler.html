@@ -30,6 +30,7 @@ harita: true
                 <button type="button" data-mod="gorunmez" aria-pressed="true">Görünmez</button>
                 <button type="button" data-mod="gorunen" aria-pressed="false">Görünen</button>
             </div>
+            <button type="button" class="ses-dugme" id="kent-ses" aria-pressed="true">Ses açık</button>
             <p class="anlati"><span>Marco Polo anlatır</span><span id="kent-anlati"></span></p>
             <p class="gunluk" id="kent-gunluk"></p>
             <p class="ipucu" id="kent-ipucu">Dokun, bir şey ekle.</p>
@@ -48,10 +49,11 @@ window.YOL_KENTLER = [
 {%- for post in site.posts reversed -%}
 {%- if post.konum -%}
 {%- assign dolu = post.content | strip_html | strip | size -%}
-  { "baslik": {{ post.title | jsonify }}, "slug": {{ post.slug | jsonify }}, "yer": {{ post.yer | jsonify }}, "donem": {{ post.donem | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "konum": {{ post.konum | jsonify }}, "kent": {{ post.kent | jsonify }}, "hayal_adi": {{ post.hayal_adi | jsonify }}, "hayal": {{ post.hayal | jsonify }}, "gunler": {{ site.data.gunluk.kentler[post.slug] | jsonify }}, "dolu": {% if dolu > 0 %}true{% else %}false{% endif %} },
+  { "baslik": {{ post.title | jsonify }}, "slug": {{ post.slug | jsonify }}, "yer": {{ post.yer | jsonify }}, "donem": {{ post.donem | jsonify }}, "url": {{ post.url | relative_url | jsonify }}, "konum": {{ post.konum | jsonify }}, "kent": {{ post.kent | jsonify }}, "hayal_adi": {{ post.hayal_adi | jsonify }}, "hayal": {{ post.hayal | jsonify }}, "sesler": {{ post.sesler | jsonify }}, "gunler": {{ site.data.gunluk.kentler[post.slug] | jsonify }}, "dolu": {% if dolu > 0 %}true{% else %}false{% endif %} },
 {%- endif -%}
 {%- endfor -%}
 ];
 </script>
 <script src="{{ '/assets/leaflet/leaflet.js' | relative_url }}"></script>
+<script src="{{ '/assets/ses.js' | relative_url }}"></script>
 <script src="{{ '/assets/kentler.js' | relative_url }}"></script>

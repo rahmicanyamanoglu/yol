@@ -70,6 +70,8 @@
         return g;
     };
     Cizer.prototype.hareket = function (f) { this.hareketler.push(f); };
+    // Çizimdeki olayları (şimşek gibi) dinleyene, örneğin sese bildirir
+    Cizer.prototype.olay = function (ad) { if (this.dinleyici) this.dinleyici(ad); };
     Cizer.prototype.e = function (g, ad, at, sinif) {
         var e = document.createElementNS(NS, ad);
         for (var k in at) e.setAttribute(k, at[k]);
@@ -598,6 +600,7 @@
                 isik.style.opacity = yaniyor ? 0.35 : 0;
                 cakma.style.opacity = yaniyor ? 1 : 0;
                 if (an !== sonCakma) {
+                    if (sonCakma !== -1) c.olay('simsek');
                     sonCakma = an;
                     var x = 80 + ((an * 7919) % 440), y = 0, yol = 'M' + x + ' ' + y;
                     while (y < 330) { y += 30 + ((an * 31 + y) % 30); x += ((an + y) % 2 ? 1 : -1) * (10 + (y % 17)); yol += ' L' + x + ' ' + y; }
@@ -649,7 +652,8 @@
             bicim: bicim,
             gunler: gunler,
             son: son,
-            hava: h
+            hava: h,
+            cizer: c
         };
         sahneler.push(sahne);
         return sahne;
@@ -713,6 +717,34 @@
         try { localStorage.setItem(anahtar(k), JSON.stringify(liste.slice(-80))); } catch (e) { /* depolama kapalı olabilir */ }
     }
 
+    /* ---- ses ---- */
+    var sesDugme = document.getElementById('kent-ses');
+    var Ses = window.KentSesi;
+    function sesAcik() {
+        try { return localStorage.getItem('yol-ses') !== 'kapali'; } catch (e) { return true; }
+    }
+    function sesGoster() {
+        var acik = sesAcik();
+        sesDugme.setAttribute('aria-pressed', String(acik));
+        sesDugme.textContent = acik ? 'Ses açık' : 'Ses kapalı';
+    }
+    function sesBaslat() {
+        if (!Ses || !Ses.destek || !icSahne || !simdiki || !sesAcik()) return;
+        Ses.baslat({
+            sesler: simdiki.sesler,
+            bicim: icSahne.bicim,
+            hava: icSahne.hava,
+            A: icSahne.A,
+            sicaklik: icSahne.son && sayi(icSahne.son.sc_max) ? icSahne.son.sc_max : null
+        });
+    }
+    if (!Ses || !Ses.destek) sesDugme.hidden = true;
+    sesDugme.addEventListener('click', function () {
+        try { localStorage.setItem('yol-ses', sesAcik() ? 'kapali' : 'acik'); } catch (e) { /* depolama kapalı olabilir */ }
+        sesGoster();
+        if (sesAcik()) sesBaslat(); else Ses.durdur();
+    });
+
     function tr(v, basamak) {
         return Number(v).toLocaleString('tr-TR', { maximumFractionDigits: basamak || 0 });
     }
@@ -756,6 +788,7 @@
         simdiki = kent;
         if (icSahne) sahneler.splice(sahneler.indexOf(icSahne), 1);
         icSahne = kur(sahneSvg, kent, { aktif: !azHareket });
+        icSahne.cizer.dinleyici = function (ad) { if (ad === 'simsek' && Ses) Ses.gok(); };
         oku(kent).forEach(function (p) { icSahne.ekle(p[0], p[1], null, ''); });
         document.getElementById('kent-tur').textContent = kent.bicimAd;
         document.getElementById('kent-ad').textContent = kent.hayal_adi || kent.baslik;
@@ -770,6 +803,8 @@
         void sahneSvg.getBoundingClientRect();
         sahneSvg.classList.add('ciziliyor');
         mod('gorunmez');
+        sesGoster();
+        sesBaslat();
         if (pencere.open) return;
         if (typeof pencere.showModal === 'function') pencere.showModal();
         else pencere.setAttribute('open', '');
@@ -779,7 +814,10 @@
         if (typeof pencere.close === 'function') pencere.close();
         else pencere.removeAttribute('open');
     }
-    pencere.addEventListener('close', function () { if (icSahne) icSahne.aktif = false; });
+    pencere.addEventListener('close', function () {
+        if (icSahne) icSahne.aktif = false;
+        if (Ses) Ses.durdur();
+    });
 
     function svgNokta(olay) {
         var p = sahneSvg.createSVGPoint();

@@ -300,6 +300,21 @@ svg .simsek { fill: none; stroke: var(--altin); stroke-width: 2.2; stroke-linejo
 .dugme.sade { border-color: transparent; color: var(--soluk); padding-left: .4rem; padding-right: .4rem; }
 .dugme.sade:hover { background: transparent; color: var(--murekkep); }
 .kent-eylem { display: flex; flex-wrap: wrap; gap: .5rem; }
+.ses-dugme {
+    font: inherit; font-size: .85rem; cursor: pointer; align-self: flex-start;
+    background: transparent; color: var(--soluk); border: none; padding: 0;
+    display: inline-flex; align-items: center; gap: .45rem;
+}
+.ses-dugme::before {
+    content: ''; width: 1.1em; height: 1.1em; background: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4z'/%3E%3Cpath d='M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4z'/%3E%3Cpath d='M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.ses-dugme[aria-pressed="true"] { color: var(--vurgu); }
+.ses-dugme[aria-pressed="false"]::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4z'/%3E%3Cpath d='m22 9-6 6M16 9l6 6'/%3E%3C/svg%3E");
+            mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M11 5 6 9H2v6h4l5 4z'/%3E%3Cpath d='m22 9-6 6M16 9l6 6'/%3E%3C/svg%3E");
+}
 
 .isaret {
     background: var(--vurgu); border: 3px solid var(--kagit); border-radius: 50%;

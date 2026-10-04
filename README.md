@@ -26,6 +26,10 @@ Site GitHub Pages üzerinde Jekyll ile kendiliğinden oluşur; `main` dalına gi
 
 `kent` yazılmazsa biçim addan türetilir. Bir kente tıklayınca içeri girilir: çizim kendini çizer, imleçle derinlik kazanır, dokunulan yere kentin biçimine uygun yeni bir parça eklenir (ziyaretçinin tarayıcısında saklanır). "Görünen" düğmesi aynı yeri gerçek haritada gösterir; `hayal` cümlesi "Marco Polo anlatır" başlığıyla yanında durur.
 
+## Sesler
+
+Bir kent açıldığında sesleri çalar (pencerede "Ses açık/kapalı" düğmesi, tercih tarayıcıda saklanır). Hiç ses dosyası yoktur; `assets/ses.js` her sesi Web Audio ile o anda üretir. Kentin kendi sesleri `sesler` alanından gelir; üstüne havası eklenir: rüzgâr (günün rüzgârıyla), yağmur ve damlalar, şimşekle eşzamanlı gök gürültüsü, açık havada kuşlar, aynalı kentte su. Cırcır böcekleri yalnızca sıcak günlerde öter.
+
 ## Günlük veri
 
 `.github/workflows/gunluk.yml` her gün 05:17 UTC'de `scripts/gunluk.py`'yi çalıştırır. Betik her yer için dünkü havayı ([Open-Meteo](https://open-meteo.com/)) ve İngilizce Vikipedi görüntülenme sayısını (Wikimedia) çekip `_data/gunluk.json`'a ekler, değişiklik varsa kaydeder; site kendini yeniden kurar. Anahtar ya da hesap gerekmez.
