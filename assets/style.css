@@ -320,3 +320,9 @@ svg .simsek { fill: none; stroke: var(--altin); stroke-width: 2.2; stroke-linejo
     background: var(--vurgu); border: 3px solid var(--kagit); border-radius: 50%;
     box-shadow: 0 0 0 1px var(--vurgu);
 }
+
+/* hakkında: ses kaynakları */
+.kaynaklar { margin-top: 3rem; font-size: .85rem; color: var(--soluk); }
+.kaynaklar summary { cursor: pointer; }
+.kaynaklar ul { margin-top: .5rem; padding-left: 1.2em; columns: 2 240px; }
+.kaynaklar a { color: var(--soluk); }

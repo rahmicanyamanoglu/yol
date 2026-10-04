@@ -30,6 +30,12 @@ Site GitHub Pages üzerinde Jekyll ile kendiliğinden oluşur; `main` dalına gi
 
 Bir kent açıldığında sesleri çalar (pencerede "Ses açık/kapalı" düğmesi, tercih tarayıcıda saklanır). Hiç ses dosyası yoktur; `assets/ses.js` her sesi Web Audio ile o anda üretir. Kentin kendi sesleri `sesler` alanından gelir; üstüne havası eklenir: rüzgâr (günün rüzgârıyla), yağmur ve damlalar, şimşekle eşzamanlı gök gürültüsü, açık havada kuşlar, aynalı kentte su. Cırcır böcekleri yalnızca sıcak günlerde öter.
 
+### Gerçek kayıtlar (freesound, CC0)
+
+Kentlerin çoğunda gerçek kayıtlar çalar (`kayitlar` alanı): `ortam` ve `inşaat` kesintisiz yatak, `bağırış` kısa kesit, diğer türler (metro, metrobüs, tramvay, martı, kalabalık, pazar...) ara ara birkaç saniyelik kesit. Bir türün kaydı varsa sentezlenmiş karşılığı susar. Kayıtların düzeyi tarayıcıda ölçülüp eşitlenir.
+
+Yeni kayıt eklemek: **Actions → Freesound sesleri → Run workflow**, `mod: ara` ve sorgular (`istanbul|metro|...`) ile CC0 adayları iş günlüğüne listelenir; `mod: indir` ve ses numaralarıyla indirilir (CC0 değilse indirilmez, kaynak `_data/ses_kaynaklari.json`'a yazılır); `mod: sikistir` büyük dosyaları mono 80 kbps'e ve 90 saniyeye indirir. Kaydedenlerin listesi Hakkında sayfasının altında.
+
 ## Günlük veri
 
 `.github/workflows/gunluk.yml` her gün 05:17 UTC'de `scripts/gunluk.py`'yi çalıştırır. Betik her yer için dünkü havayı ([Open-Meteo](https://open-meteo.com/)) ve İngilizce Vikipedi görüntülenme sayısını (Wikimedia) çekip `_data/gunluk.json`'a ekler, değişiklik varsa kaydeder; site kendini yeniden kurar. Anahtar ya da hesap gerekmez.

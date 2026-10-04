@@ -324,12 +324,21 @@
                     .then(function (v) { return new Promise(function (ok, red) { ctx.decodeAudioData(v, ok, red); }); })
                     .then(function (tampon) {
                         if (oturum !== yukleme) return; // bu arada başka kente geçildi
+                        tampon.__kazanc = esitle(tampon);
                         kayitlar[tur].push(tampon);
                         if (hazir && kayitlar[tur].length === 1) hazir(tur);
                     })
                     .catch(function () { /* bozuk ya da eksik dosya: atla */ });
             });
         });
+    }
+    // Kayıtlar farklı düzeylerde kaydedilmiş; ortalama gücünü (RMS) ölçüp
+    // hepsini benzer bir yüksekliğe getir
+    function esitle(tampon) {
+        var d = tampon.getChannelData(0), adim = Math.max(1, Math.floor(d.length / 200000)), top = 0, n = 0;
+        for (var i = 0; i < d.length; i += adim) { top += d[i] * d[i]; n++; }
+        var rms = Math.sqrt(top / Math.max(1, n));
+        return rms > 0 ? Math.max(0.4, Math.min(6, 0.1 / rms)) : 1;
     }
     function kaydiVar(tur) { return !!(ayar && ayar.kayitlar && ayar.kayitlar[tur] && ayar.kayitlar[tur].length); }
 
@@ -341,6 +350,7 @@
         var sure = Math.min(tampon.duration, rnd(enAz, enCok)), bas = Math.random() * Math.max(0, tampon.duration - sure);
         var s = ctx.createBufferSource(), g = kazanc(0), p = pan(rnd(-0.6, 0.6)), t = ctx.currentTime;
         s.buffer = tampon;
+        ses *= tampon.__kazanc || 1;
         bagla(s, g, p, ana);
         g.gain.setValueAtTime(0, t);
         g.gain.linearRampToValueAtTime(ses, t + 0.4);
@@ -357,6 +367,7 @@
         var tampon = kayitlar[tur][Math.floor(Math.random() * kayitlar[tur].length)];
         var s = ctx.createBufferSource(), g = kazanc(0), p = pan(rnd(-0.3, 0.3)), t = ctx.currentTime, gecis = 2;
         s.buffer = tampon;
+        ses *= tampon.__kazanc || 1;
         bagla(s, g, p, ana);
         g.gain.setValueAtTime(0, t);
         g.gain.linearRampToValueAtTime(ses, t + gecis);
@@ -415,20 +426,27 @@
         var sesler = (ayar.sesler || '').split(/[\s,]+/).filter(Boolean);
         // Kayıt türleri: "ortam" ve "inşaat" kesintisiz yatak olur, "bağırış" kısa
         // kesitlerle gelir, geri kalan her tür (metro, martı, kalabalık...) ara ara
-        // birkaç saniyelik kesitlerle çalar. Kentin gerçek kaydı varsa sentezlenmiş
-        // kent sesleri susar; hava sesleri (rüzgâr, yağmur, gök gürültüsü) kalır.
+        // birkaç saniyelik kesitlerle çalar. Gerçek kaydı olan ses türünün
+        // sentezlenmiş karşılığı susar (ortam kaydı trafik uğultusunun yerini alır);
+        // kaydı olmayanlar (ör. kilise) sentezle sürer, hava sesleri hep kalır.
         var YATAK = { 'ortam': 0.5, 'inşaat': 0.55 };
+        var sicak = ayar.sicaklik == null || ayar.sicaklik >= 20;
         var turler = Object.keys(ayar.kayitlar || {}).filter(kaydiVar);
-        var gercekKent = turler.some(function (t) { return t !== 'bağırış'; });
         kayitlariYukle(ayar.kayitlar, ayar.taban, function (tur) {
             if (!aktif) return;
             if (YATAK[tur]) yatak(tur, YATAK[tur] * sus);
         });
         turler.forEach(function (tur) {
             if (YATAK[tur] || tur === 'bağırış') return;
+            if (tur === 'cırcır' && !sicak) return;
             tekrarla(function () { kesitCal(tur, 4, 9, 0.6 * sus); }, 6, 16);
         });
-        if (gercekKent) sesler = sesler.filter(function (t) { return t === 'bağırış'; });
+        sesler = sesler.filter(function (t) {
+            if (t === 'bağırış') return true;
+            if (turler.indexOf(t) > -1) return false;
+            if (t === 'trafik' && turler.indexOf('ortam') > -1) return false;
+            return true;
+        });
         var h = ayar.hava || {}, A = ayar.A || 0.5;
         var sus = h.kar ? 0.5 : 1; // kar sesi bastırır
 
