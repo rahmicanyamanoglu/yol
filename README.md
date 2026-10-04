@@ -4,6 +4,10 @@ Yol hikâyeleri ve anılar. Yayın adresi: <https://rcyamanoglu.com/yol/>
 
 Site GitHub Pages üzerinde Jekyll ile kendiliğinden oluşur; `main` dalına giren her değişiklik bir iki dakika içinde yayına çıkar.
 
+## Obsidian'la yazmak
+
+`_yazilar/` bir Obsidian kasasıdır: her kentin bir notu var (`Lund.md`, `İstanbul.md`...). Hikâye notun içine, üstteki iki `---` çizgisinin altına yazılır. Bir kentin notu doluysa sayfasında o metin görünür; boşsa yazının (`_posts/`) kendi metni. Notun adı yazının `title`'ıyla aynı olmalı. Notlara sürüklenen fotoğraflar `_yazilar/ekler/` altına düşer, `.github/workflows/ekler.yml` onları `assets/img/yazilar/` altına kopyalayıp yayımlar. `Yol.md` kasanın giriş notudur, yayımlanmaz.
+
 ## Yeni hikâye eklemek
 
 1. `_drafts/ornek-hikaye.md` dosyasını kopyala, üst kısımdaki bilgileri doldur, metni yaz.

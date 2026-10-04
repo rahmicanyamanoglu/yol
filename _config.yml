@@ -12,6 +12,11 @@ kramdown:
   input: GFM
   smart_quotes: ["apos", "apos", "quot", "quot"]
 
+# Obsidian kasası: kent başına bir not (_yazilar/<Kent başlığı>.md)
+collections:
+  yazilar:
+    output: false
+
 plugins:
   - jekyll-feed
   - jekyll-seo-tag

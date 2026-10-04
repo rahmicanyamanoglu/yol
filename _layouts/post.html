@@ -1,7 +1,8 @@
 ---
 layout: default
 ---
-{%- assign dolu = content | strip_html | strip | size -%}
+{%- include metin.html p=page -%}
+{%- assign dolu = metin | strip_html | strip | size -%}
 <article class="yazi">
     <header class="yazi-bas">
         {% include kunye.html p=page %}
@@ -24,7 +25,7 @@ layout: default
     {% endif %}
 
     <div class="metin">
-        {% if dolu > 0 %}{{ content }}{% else %}<p class="bos">Bu hikâye henüz yazılmadı.</p>{% endif %}
+        {% if dolu > 0 %}{{ metin }}{% else %}<p class="bos">Bu hikâye henüz yazılmadı.</p>{% endif %}
     </div>
 
     <nav class="komsu">

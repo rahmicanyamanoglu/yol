@@ -1,0 +1,14 @@
+{%- comment -%}
+  Bir kentin hikâye metnini verir. Önce Obsidian notuna (_yazilar/<başlık>.md)
+  bakar, not boşsa yazının kendi metnini kullanır. Notlardaki ekler/ yolları
+  yayımlanan kopyalarına (assets/img/yazilar/) çevrilir.
+  Kullanım: include metin.html p=page_ya_da_post  → değişken: metin
+{%- endcomment -%}
+{%- assign notu = site.yazilar | where: "slug", include.p.title | first -%}
+{%- assign not_metni = notu.content | strip -%}
+{%- if not_metni != "" and not_metni != nil -%}
+  {%- assign ek_yolu = site.baseurl | append: "/assets/img/yazilar/" -%}
+  {%- capture metin -%}{{ not_metni | markdownify | replace: 'src="ekler/', 'src="EKYOLU' | replace: 'src="./ekler/', 'src="EKYOLU' | replace: 'EKYOLU', ek_yolu }}{%- endcapture -%}
+{%- else -%}
+  {%- capture metin -%}{{ include.p.content }}{%- endcapture -%}
+{%- endif -%}
